@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JET 4 - ציידי השדים: הריצה</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body { font-family: 'Rubik', sans-serif; background:#050914; color:#e2e8f0; min-height:100vh; overflow-x:hidden; user-select:none; }
+    .app-container { direction: rtl; max-width: 1100px; margin: 0 auto; }
+    .view-transition { animation: fadeSlide .45s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes fadeSlide { from { opacity:0; transform: translateY(12px) scale(0.985); } to { opacity:1; transform: translateY(0) scale(1); } }
+
+    /* Territory / Boss vibe */
+    body.territory {
+      background: radial-gradient(circle at 50% 50%, rgba(244, 63, 94, 0.16), transparent 70%), linear-gradient(180deg, #0b1024, #1b1540);
+      animation: territoryGlow 3s ease-in-out infinite alternate;
+    }
+    @keyframes territoryGlow { 0% { filter: brightness(1); } 100% { filter: brightness(1.16); } }
+
+    /* Cards */
+    .rarity-common { border-color: rgba(148,163,184,.45); box-shadow: 0 0 10px rgba(148,163,184,0.12); }
+    .rarity-rare { border-color: rgba(59,130,246,.75); box-shadow: 0 0 16px rgba(59,130,246,0.25); background: linear-gradient(135deg, rgba(59,130,246,0.10), transparent); }
+    .rarity-epic { border-color: rgba(168,85,247,.85); box-shadow: 0 0 22px rgba(168,85,247,0.30); background: linear-gradient(135deg, rgba(168,85,247,0.14), transparent); border-width: 2px; }
+
+    .btn { transition: .2s; }
+    .btn:active { transform: scale(.98); }
+
+    /* Match cards */
+    .game-card { cursor:pointer; transition:all .18s ease; border:2px solid rgba(255,255,255,.10); user-select:none; }
+    .game-card:hover { transform:translateY(-3px); box-shadow:0 12px 26px rgba(0,0,0,.42); border-color:#f472b6; }
+    .selected { border-color:#f472b6 !important; background:rgba(244,114,182,.12); }
+    .matched { background:#064e3b !important; border-color:#34d399 !important; }
+    .wrong { background:#7f1d1d !important; border-color:#f87171 !important; animation: shake .35s; }
+
+    @keyframes shake { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-5px); } 75% { transform:translateX(5px); } }
+
+    /* Tooltip */
+    .clickable-word { cursor: pointer; border-bottom: 2px dashed rgba(255,255,255,0.25); transition: all 0.15s; padding-bottom: 1px; }
+    .clickable-word:hover { color: #f472b6; border-color: #f472b6; }
+    .translation-tooltip {
+      position:absolute; background:#0f172a; color:#fff; padding:6px 10px; border-radius:10px;
+      font-size:.9rem; font-weight:800; border:1px solid rgba(244,114,182,.8);
+      box-shadow:0 10px 26px rgba(0,0,0,.55); z-index:200; pointer-events:none;
+      transform: translate(-50%,-110%); margin-top:-8px; white-space:nowrap;
+      animation: tipIn .18s ease-out;
+    }
+    @keyframes tipIn { from { opacity:0; transform: translate(-50%,-95%); } to { opacity:1; transform: translate(-50%,-110%); } }
+
+    /* Map Nodes */
+    .map-node {
+      width: 78px; height: 78px; border-radius: 50%;
+      background:#1e293b; border:4px solid #475569;
+      display:flex; align-items:center; justify-content:center;
+      font-size: 30px; position:relative; z-index:10;
+      transition: all .25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .map-node.current { border-color:#ef4444; background:#7f1d1d; transform:scale(1.12); box-shadow:0 0 26px rgba(239,68,68,.55); cursor:pointer; animation:pulseNode 2s infinite; }
+    .map-node.completed { border-color:#10b981; background:#064e3b; color:#10b981; }
+    .map-node.locked { opacity:.4; filter:grayscale(1); cursor:not-allowed; }
+    @keyframes pulseNode { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 18px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+    .node-connector { position:absolute; width:6px; background:#334155; height:58px; z-index:0; left:50%; transform:translateX(-50%); top:-58px; border-radius:999px; }
+    .node-connector.active { background:#ef4444; box-shadow:0 0 10px rgba(239,68,68,.45); }
+
+    /* Potions */
+    .potion-pill { border:1px solid rgba(148,163,184,.3); background:rgba(15,23,42,.65); }
+    .potion-pill:hover { border-color: rgba(244,114,182,.8); background: rgba(244,114,182,.12); }
+
+    /* Timer bar */
+    .timer-bar-wrap { background:#0b1224; border:1px solid rgba(148,163,184,.22); box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
+    .timer-bar { transition: width .08s linear; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{ width:6px; }
+    ::-webkit-scrollbar-track{ background:#0f172a; }
+    ::-webkit-scrollbar-thumb{ background:#334155; border-radius:3px; }
+  </style>
+</head>
+
+<body class="text-slate-200">
+  <div id="app-root" class="relative min-h-screen flex flex-col">
+
+    <!-- Header / HUD -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-700 sticky top-0 z-50 p-4 shadow-2xl">
+      <div class="app-container flex justify-between items-center gap-4">
+        <!-- Left: Player -->
+        <div class="flex items-center gap-4">
+          <div class="relative cursor-pointer transition transform hover:scale-105" onclick="Game.showProfile()">
+            <img id="hud-avatar" src="" class="w-14 h-14 rounded-full border-2 border-slate-500 object-cover bg-slate-800 shadow-lg">
+          </div>
+
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2 text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">
+              <span>כוח</span>
+              <span id="hud-hp-text" class="text-white">100/100</span>
+              <span class="mx-2 text-slate-600">|</span>
+              <span class="text-slate-400">XP</span>
+              <span id="hud-xp" class="text-white">0</span>
+              <span class="text-slate-600">/</span>
+              <span id="hud-xp-next" class="text-white">100</span>
+            </div>
+            <div class="w-40 h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700 shadow-inner">
+              <div id="hud-hp-bar" class="h-full bg-gradient-to-r from-red-600 to-orange-500 transition-all duration-300" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Resources + Nav -->
+        <div class="flex items-center gap-3">
+          <button onclick="Game.showDeck()" class="btn hidden sm:block px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold">
+            🃏 קלפים <span id="hud-deck-count" class="text-slate-400 text-sm"></span>
+          </button>
+          <button onclick="Game.showShop()" class="btn hidden sm:block px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold">
+            🧪 שיקויים
+          </button>
+          <div class="text-right px-3">
+            <div class="text-[10px] text-slate-500 uppercase font-black tracking-wider">נשמות</div>
+            <div class="text-2xl font-black text-emerald-400 flex items-center gap-1 drop-shadow-md">
+              <span id="hud-souls">0</span> 👻
+            </div>
+          </div>
+          <button onclick="Game.toggleSettings()" class="btn p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition" title="הגדרות">
+            ⚙️
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-view" class="flex-1 app-container w-full p-4 relative"></main>
+  </div>
+
+  <!-- Global Modals -->
+  <!-- 1. Story Modal -->
+  <div id="story-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4 bg-black/95 backdrop-blur-md view-transition">
+    <div class="bg-slate-900 border border-slate-600 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh] relative">
+      <button onclick="Game.closeModal('story-modal')" class="absolute top-4 left-4 z-20 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/70 font-bold">✕</button>
+
+      <div class="relative h-64 shrink-0">
+        <img id="story-image" src="" class="w-full h-full object-cover opacity-90 transition-opacity duration-700" alt="Story">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+        <div class="absolute bottom-6 right-6 z-10">
+          <div class="inline-block bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-2 shadow-lg" id="story-level-badge">שלב 1</div>
+          <h3 id="story-title" class="text-4xl font-black text-white drop-shadow-xl leading-none">Title</h3>
+          <div class="text-slate-300 text-sm font-bold flex items-center gap-2 mt-2">
+            <span id="story-location">📍 מיקום</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-8 overflow-y-auto bg-slate-900">
+        <div class="flex gap-5 mb-8 items-start">
+          <img id="story-speaker-img" src="" class="w-20 h-20 rounded-2xl border-2 border-slate-600 bg-slate-800 object-cover shrink-0 shadow-lg" alt="Speaker">
+          <div class="bg-slate-800/60 p-4 rounded-r-2xl rounded-bl-2xl border border-slate-700 relative flex-1">
+            <div class="text-xs text-red-400 font-bold uppercase tracking-wider mb-1" id="story-speaker-name">דובר</div>
+            <p id="story-text" class="text-lg text-slate-100 leading-relaxed italic">"..."</p>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-5 rounded-2xl border-r-4 border-red-500 mb-6 shadow-md">
+          <div class="text-xs text-slate-500 font-bold uppercase mb-2 tracking-widest">המטרה הלימודית</div>
+          <div id="story-objective" class="text-white font-black text-xl"></div>
+          <div class="text-slate-400 text-sm mt-2 leading-relaxed" id="story-skill"></div>
+        </div>
+
+        <div class="flex items-center justify-between gap-3 mb-6">
+          <div class="text-slate-400 text-sm">
+            <span class="font-bold text-white">שיקויים זמינים:</span>
+            <span id="story-potions" class="text-slate-300"></span>
+          </div>
+          <button onclick="Game.showShop()" class="btn text-sm bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl font-bold">
+            לקנות שיקויים 🧪
+          </button>
+        </div>
+
+        <button id="story-start-btn"
+          class="w-full py-4 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-black text-xl rounded-2xl shadow-xl shadow-red-900/20 transition transform hover:scale-[1.02] flex items-center justify-center gap-3">
+          <span>התחלי משימה</span> <span class="text-2xl">⚔️</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Generic Message/Confirm Modal -->
+  <div id="msg-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm view-transition">
+    <div class="bg-slate-900 border border-slate-600 rounded-3xl w-full max-w-md shadow-2xl p-6 text-center relative overflow-hidden">
+      <!-- Glow effect -->
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-50"></div>
+
+      <h3 id="msg-title" class="text-2xl font-black text-white mb-4"></h3>
+      <div id="msg-body" class="text-slate-300 mb-8 leading-relaxed text-lg"></div>
+      <div id="msg-actions" class="flex justify-center gap-4"></div>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <template id="tpl-char-select">
+    <div class="flex flex-col items-center justify-center min-h-[80vh] view-transition py-10">
+      <div class="text-center mb-10">
+        <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-4 drop-shadow-sm">הציידים - עונה 1</h1>
+        <p class="text-slate-400 text-lg max-w-md mx-auto">
+          כיתה ד - אוצר מילים + דקדוק. בכל שלב לומדים, מתרגלים, ומקבלים פרסים.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl px-4" id="char-grid"></div>
+
+      <button id="start-campaign-btn" disabled
+        class="mt-12 px-12 py-5 bg-slate-800 text-slate-500 rounded-2xl font-black text-2xl transition-all shadow-xl opacity-50 cursor-not-allowed transform hover:scale-105">
+        התחלי את המסע 🚀
+      </button>
+
+      <div class="mt-6 text-slate-500 text-sm max-w-lg text-center leading-relaxed">
+        טיפ: המשחק שומר התקדמות. כדי שהלמידה תהיה אמיתית - עונים נכון, מקבלים חיזוק, וחוזרים למילים שטעו בהן.
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-map">
+    <div class="view-transition max-w-lg mx-auto text-center pt-8 pb-24">
+      <div class="mb-10 bg-slate-800/50 p-6 rounded-3xl border border-slate-700 shadow-xl backdrop-blur-sm">
+        <h2 class="text-3xl font-black text-white mb-2" id="map-title"></h2>
+        <p class="text-slate-400 font-medium" id="map-subtitle">לחצי על השלב הנוכחי כדי לפתוח סיפור ומשימה.</p>
+      </div>
+
+      <div id="map-nodes" class="flex flex-col items-center relative gap-4"></div>
+
+      <div class="fixed bottom-8 left-0 right-0 text-center pointer-events-none z-20">
+        <div class="pointer-events-auto inline-flex gap-2 bg-slate-900/80 border border-slate-700 rounded-full px-3 py-2 shadow-2xl backdrop-blur-md">
+          <button onclick="Game.changeCharacter()"
+            class="btn bg-slate-900 hover:bg-slate-800 text-slate-200 px-4 py-2 rounded-full border border-slate-600 font-bold text-sm">
+            ↩️ דמות אחרת
+          </button>
+          <button onclick="Game.showDeck()"
+            class="btn bg-slate-900 hover:bg-slate-800 text-slate-200 px-4 py-2 rounded-full border border-slate-600 font-bold text-sm">
+            🃏 אוסף
+          </button>
+          <button onclick="Game.showShop()"
+            class="btn bg-slate-900 hover:bg-slate-800 text-slate-200 px-4 py-2 rounded-full border border-slate-600 font-bold text-sm">
+            🧪 שיקויים
+          </button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-gameplay">
+    <div class="view-transition flex flex-col h-full max-w-3xl mx-auto py-4">
+      <div class="flex justify-between items-center mb-4 px-2">
+        <button onclick="Game.showMap()" class="btn text-sm text-slate-200 flex items-center gap-2 font-bold bg-slate-800 px-3 py-2 rounded-xl border border-slate-700">
+          יציאה ➜
+        </button>
+        <div class="text-slate-500 text-xs font-bold uppercase tracking-widest" id="game-stage-indicator">שלב 1/6</div>
+      </div>
+
+      <!-- Potions bar -->
+      <div class="mb-4 flex flex-wrap gap-2 justify-center">
+        <button class="btn potion-pill px-3 py-2 rounded-xl font-bold text-sm"
+          onclick="Game.usePotion('hint')" id="potion-hint">
+          💡 רמז <span class="text-slate-400" id="potion-hint-count"></span>
+        </button>
+        <button class="btn potion-pill px-3 py-2 rounded-xl font-bold text-sm"
+          onclick="Game.usePotion('shield')" id="potion-shield">
+          🛡️ מגן <span class="text-slate-400" id="potion-shield-count"></span>
+        </button>
+        <button class="btn potion-pill px-3 py-2 rounded-xl font-bold text-sm"
+          onclick="Game.usePotion('freeze')" id="potion-freeze">
+          🧊 הקפאת זמן <span class="text-slate-400" id="potion-freeze-count"></span>
+        </button>
+      </div>
+
+      <!-- Boss HUD -->
+      <div id="boss-hud" class="hidden mb-5 bg-slate-800/90 p-5 rounded-2xl border border-red-500/30 shadow-2xl relative overflow-hidden">
+        <div class="absolute inset-0 bg-red-600/6 z-0"></div>
+        <div class="relative z-10">
+          <div class="flex justify-between items-center mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">👹</span>
+              <span class="text-red-400 font-black text-xl tracking-wide">BOSS</span>
+            </div>
+            <span id="boss-name" class="text-white font-bold text-lg"></span>
+          </div>
+          <div class="h-6 bg-slate-900 rounded-full overflow-hidden border border-slate-700/50 shadow-inner">
+            <div id="boss-bar" class="h-full bg-gradient-to-r from-red-600 to-red-500 transition-all duration-500 ease-out" style="width:100%"></div>
+          </div>
+          <div class="mt-3 text-slate-300 text-sm font-bold" id="boss-mechanic"></div>
+        </div>
+      </div>
+
+      <!-- Timer -->
+      <div id="timer-wrap" class="hidden mb-4 w-full max-w-xl mx-auto">
+        <div class="timer-bar-wrap rounded-full overflow-hidden h-3">
+          <div id="timer-bar" class="timer-bar h-full bg-gradient-to-r from-yellow-500 to-red-500" style="width:100%"></div>
+        </div>
+        <div class="text-xs text-slate-500 mt-2 text-center font-bold">זמן לשאלה</div>
+      </div>
+
+      <div id="game-content" class="flex-1 flex flex-col items-center justify-center min-h-[420px] w-full"></div>
+
+      <div class="mt-6 text-center h-24 flex flex-col justify-end">
+        <div id="feedback" class="text-3xl font-black transition-all duration-300 transform"></div>
+        <div class="text-xs text-slate-500 mt-2">טיפ: לחצי על מילה באנגלית לקבלת תרגום</div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-rewards">
+    <div class="view-transition max-w-2xl mx-auto pt-10 text-center">
+      <div class="text-6xl mb-4">🎁</div>
+      <h2 class="text-4xl font-black text-white mb-2">סיימת את השלב!</h2>
+      <p class="text-slate-400 mb-8">בחרי פרס אחד. הפרסים עוזרים לך ללמוד ולהתקדם.</p>
+      <div id="rewards-grid" class="grid gap-4"></div>
+      <button onclick="Game.continueAfterRewards()" class="btn mt-8 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-6 py-3 rounded-2xl font-black text-lg">
+        המשך ➜
+      </button>
+    </div>
+  </template>
+
+  <template id="tpl-deck">
+    <div class="view-transition">
+      <div class="flex flex-wrap gap-3 justify-between items-center mb-6">
+        <div>
+          <h2 class="text-3xl font-black text-white">אוסף הקלפים</h2>
+          <div class="text-slate-400 text-sm mt-1">ככל שהאוסף גדל, השאלות מגוונות יותר - והלמידה עמוקה יותר.</div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="Game.showMap()" class="btn bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl font-bold">חזרה</button>
+          <button onclick="Game.openPack()" class="btn bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 px-4 py-2 rounded-xl font-black text-white">
+            לפתוח חבילה (200 👻)
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="deck-grid"></div>
+    </div>
+  </template>
+
+  <template id="tpl-shop">
+    <div class="view-transition max-w-3xl mx-auto pt-8">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-3xl font-black text-white">חנות שיקויים</h2>
+          <div class="text-slate-400 text-sm mt-1">שיקויים הם "עזרה חכמה" - לא במקום ידע, אלא כדי לא להיתקע.</div>
+        </div>
+        <button onclick="Game.showMap()" class="btn bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl font-bold">חזרה</button>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-5">
+          <div class="text-3xl mb-2">💡</div>
+          <div class="text-xl font-black text-white">רמז</div>
+          <div class="text-slate-400 text-sm mt-2 leading-relaxed">מבטל 1 תשובה לא נכונה (בחירה) או נותן אות ראשונה (הקלדה).</div>
+          <div class="mt-4 flex justify-between items-center">
+            <div class="font-black text-emerald-300">60 👻</div>
+            <button class="btn bg-slate-900 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl font-bold" onclick="Game.buyPotion('hint',60)">לקנות</button>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-5">
+          <div class="text-3xl mb-2">🛡️</div>
+          <div class="text-xl font-black text-white">מגן</div>
+          <div class="text-slate-400 text-sm mt-2 leading-relaxed">טעות אחת לא מורידה כוח (HP) - מושלם לבוסים.</div>
+          <div class="mt-4 flex justify-between items-center">
+            <div class="font-black text-emerald-300">90 👻</div>
+            <button class="btn bg-slate-900 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl font-bold" onclick="Game.buyPotion('shield',90)">לקנות</button>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-5">
+          <div class="text-3xl mb-2">🧊</div>
+          <div class="text-xl font-black text-white">הקפאת זמן</div>
+          <div class="text-slate-400 text-sm mt-2 leading-relaxed">עוצר טיימר ל-6 שניות (כשיש זמן לשאלה).</div>
+          <div class="mt-4 flex justify-between items-center">
+            <div class="font-black text-emerald-300">120 👻</div>
+            <button class="btn bg-slate-900 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl font-bold" onclick="Game.buyPotion('freeze',120)">לקנות</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-slate-900/70 border border-slate-700 rounded-2xl p-5">
+        <div class="font-black text-white mb-2">המלאי שלך</div>
+        <div class="text-slate-300 text-sm" id="shop-inventory"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-victory">
+    <div class="view-transition flex flex-col items-center justify-center min-h-[80vh] text-center px-4">
+      <div class="text-8xl mb-6 animate-bounce">🏆</div>
+      <h2 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200 mb-4">המסע הושלם!</h2>
+      <p class="text-xl text-slate-300 max-w-lg mx-auto leading-relaxed mb-10">
+        כל הכבוד! סיימת את הסיפור של <span id="victory-char-name" class="font-bold text-white"></span>.
+      </p>
+      <div class="grid gap-3 w-full max-w-md mb-10">
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+          <div class="text-slate-400 text-sm mb-1 uppercase font-bold">נשמות</div>
+          <div class="text-4xl font-black text-emerald-400" id="victory-souls">0</div>
+        </div>
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+          <div class="text-slate-400 text-sm mb-1 uppercase font-bold">רמת שחקן</div>
+          <div class="text-4xl font-black text-sky-300" id="victory-level">1</div>
+        </div>
+      </div>
+      <button id="victory-restart-btn" class="btn px-10 py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-lg transition shadow-lg">
+        בחרי דמות חדשה
+      </button>
+    </div>
+  </template>
+
+  <script>
+    /***********************
+     * Data & Config
+     ************************/
+    const DICTIONARY = {
+      "school":"בית ספר","bully":"בריון","teacher":"מורה","friend":"חבר","student":"תלמיד","book":"ספר",
+      "police":"משטרה","street":"רחוב","car":"מכונית","night":"לילה","bad":"רע",
+      "family":"משפחה","sad":"עצוב","cry":"לבכות","mother":"אמא","sister":"אחות","home":"בית",
+      "knife":"סכין","bowl":"קערה","hot":"חם","water":"מים","food":"אוכל",
+      "counter":"צייד שדים","counters":"ציידים","strong":"חזק","help":"עזרה","ready":"מוכן","scared":"מפוחד",
+      "run":"לרוץ","jump":"לקפוץ","stop":"לעצור","go":"ללכת","hit":"להכות","kick":"לבעוט","punch":"לתת אגרוף",
+      "draw":"לצייר","paint":"לצבוע",
+      "leg":"רגל","hand":"יד","head":"ראש","back":"גב","eye":"עין","face":"פנים","ears":"אוזניים","teeth":"שיניים",
+      "in":"בתוך","on":"על","under":"מתחת","behind":"מאחורי","at":"ב-","to":"ל-","with":"עם",
+      "what":"מה","who":"מי","where":"איפה","why":"למה","when":"מתי",
+      "i":"אני","he":"הוא","she":"היא","it":"זה","we":"אנחנו","they":"הם","you":"אתה/את",
+      "am":"הינו (אני)","is":"הינו (יחיד)","are":"הינם (רבים)","have":"יש (לי-להם)","has":"יש (לו-לה)","can":"יכול-ים"
+    };
+
+    const CHARACTERS = [
+      { id:"so-mun", name:"סו-מון", role:"האס", desc:"מזמן טריטוריה. מתקדם מהר.", avatar:"https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&hair=curly&clothing=hoodie&clothingColor=ef4444" },
+      { id:"ha-na", name:"הא-נה", role:"המגלה", desc:"שומעת רוחות. רמז אחד חינם בכל שלב.", avatar:"https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka&hair=long&clothing=overall" },
+      { id:"mo-tak", name:"מו-טאק", role:"הכוח", desc:"מגן טבעי. טעות ראשונה בשלב - פחות כואבת.", avatar:"https://api.dicebear.com/7.x/avataaars/svg?seed=Jack&hair=shortFlat&clothing=blazerAndShirt" },
+      { id:"mae-ok", name:"מא-אוק", role:"המרפאה", desc:"מרפאת בין שלבים. מקבלת מעט HP בסוף שלב.", avatar:"https://api.dicebear.com/7.x/avataaars/svg?seed=Eliza&hair=bob&clothing=collarAndSweater" }
+    ];
+
+    const VOCAB = [
+      // School
+      {id:"v_school", en:"School", he:"בית ספר", topic:"school", rarity:"common"},
+      {id:"v_teacher", en:"Teacher", he:"מורה", topic:"school", rarity:"common"},
+      {id:"v_student", en:"Student", he:"תלמיד", topic:"school", rarity:"common"},
+      {id:"v_friend", en:"Friend", he:"חבר", topic:"school", rarity:"common"},
+      {id:"v_bully", en:"Bully", he:"בריון", topic:"school", rarity:"rare"},
+      {id:"v_book", en:"Book", he:"ספר", topic:"school", rarity:"common"},
+      {id:"v_pencil", en:"Pencil", he:"עיפרון", topic:"school", rarity:"common"},
+      {id:"v_paper", en:"Paper", he:"נייר", topic:"school", rarity:"common"},
+      {id:"v_draw", en:"Draw", he:"לצייר", topic:"school", rarity:"rare"},
+      {id:"v_paint", en:"Paint", he:"לצבוע", topic:"school", rarity:"rare"},
+      {id:"v_color", en:"Color", he:"צבע", topic:"school", rarity:"common"},
+      {id:"v_picture", en:"Picture", he:"תמונה", topic:"school", rarity:"common"},
+
+      // Family
+      {id:"v_family", en:"Family", he:"משפחה", topic:"family", rarity:"common"},
+      {id:"v_mother", en:"Mother", he:"אמא", topic:"family", rarity:"common"},
+      {id:"v_father", en:"Father", he:"אבא", topic:"family", rarity:"common"},
+      {id:"v_sister", en:"Sister", he:"אחות", topic:"family", rarity:"common"},
+      {id:"v_brother", en:"Brother", he:"אח", topic:"family", rarity:"common"},
+      {id:"v_baby", en:"Baby", he:"תינוק", topic:"family", rarity:"rare"},
+      {id:"v_home", en:"Home", he:"בית", topic:"family", rarity:"common"},
+
+      // Feelings
+      {id:"v_happy", en:"Happy", he:"שמח", topic:"feelings", rarity:"common"},
+      {id:"v_sad", en:"Sad", he:"עצוב", topic:"feelings", rarity:"common"},
+      {id:"v_angry", en:"Angry", he:"כועס", topic:"feelings", rarity:"rare"},
+      {id:"v_tired", en:"Tired", he:"עייף", topic:"feelings", rarity:"rare"},
+      {id:"v_scared", en:"Scared", he:"מפוחד", topic:"feelings", rarity:"rare"},
+      {id:"v_good", en:"Good", he:"טוב", topic:"feelings", rarity:"common"},
+      {id:"v_bad", en:"Bad", he:"רע", topic:"feelings", rarity:"common"},
+
+      // Actions
+      {id:"v_run", en:"Run", he:"לרוץ", topic:"actions", rarity:"common"},
+      {id:"v_jump", en:"Jump", he:"לקפוץ", topic:"actions", rarity:"common"},
+      {id:"v_go", en:"Go", he:"ללכת", topic:"actions", rarity:"common"},
+      {id:"v_stop", en:"Stop", he:"לעצור", topic:"actions", rarity:"common"},
+      {id:"v_help", en:"Help", he:"לעזור", topic:"actions", rarity:"common"},
+      {id:"v_win", en:"Win", he:"לנצח", topic:"actions", rarity:"rare"},
+
+      // City
+      {id:"v_police", en:"Police", he:"משטרה", topic:"city", rarity:"rare"},
+      {id:"v_street", en:"Street", he:"רחוב", topic:"city", rarity:"common"},
+      {id:"v_car", en:"Car", he:"מכונית", topic:"city", rarity:"common"},
+      {id:"v_night", en:"Night", he:"לילה", topic:"city", rarity:"common"},
+
+      // Prepositions
+      {id:"v_in", en:"In", he:"בתוך", topic:"grammar", rarity:"common"},
+      {id:"v_on", en:"On", he:"על", topic:"grammar", rarity:"common"},
+      {id:"v_under", en:"Under", he:"מתחת", topic:"grammar", rarity:"rare"},
+      {id:"v_behind", en:"Behind", he:"מאחורי", topic:"grammar", rarity:"rare"},
+      {id:"v_to", en:"To", he:"ל-", topic:"grammar", rarity:"rare"},
+      {id:"v_with", en:"With", he:"עם", topic:"grammar", rarity:"rare"},
+
+      // Grammar words (epic)
+      {id:"v_am", en:"am", he:"הינו (אני)", topic:"grammar", rarity:"epic"},
+      {id:"v_is", en:"is", he:"הינו (יחיד)", topic:"grammar", rarity:"epic"},
+      {id:"v_are", en:"are", he:"הינם (רבים)", topic:"grammar", rarity:"epic"},
+      {id:"v_have", en:"have", he:"יש (לי-להם)", topic:"grammar", rarity:"epic"},
+      {id:"v_has", en:"has", he:"יש (לו-לה)", topic:"grammar", rarity:"epic"},
+      {id:"v_can", en:"can", he:"יכול-ים", topic:"grammar", rarity:"epic"}
+    ];
+
+    const getCard = (id) => VOCAB.find(v => v.id === id);
+
+    const CAMPAIGNS = {
+      "so-mun": [
+        {
+          id:"sm_1", title:"הבריון במסדרון", location:"תיכון ג'ונג-ג'ין", type:"normal",
+          img:"https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1200&auto=format&fit=crop",
+          speaker:"so-mun",
+          text:"היק-וו שוב מציק. כדי להגן על חברים - צריך לזהות מילים של בית ספר.",
+          objective:"אוצר מילים - בית ספר (התאמה).",
+          skill:"מטרה: לחבר מילה באנגלית לתרגום בעברית.",
+          gameType:"match",
+          vocabIds:["v_school","v_teacher","v_student","v_friend","v_book","v_bully"]
+        },
+        {
+          id:"sm_2", title:"שיעור אומנות", location:"כיתת הציור", type:"normal",
+          img:"https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=1200&auto=format&fit=crop",
+          speaker:"so-mun",
+          text:"הרוח החביאה את הציוד. תמצאי את המילים הנכונות.",
+          objective:"אוצר מילים - ציור וכלי כתיבה (הקלדה).",
+          skill:"מטרה: כתיבה נכונה באנגלית לפי עברית.",
+          gameType:"typing",
+          vocabIds:["v_pencil","v_paper","v_draw","v_paint","v_color","v_picture"]
+        },
+        {
+          id:"sm_3", title:"הזימון ליונג", location:"עולם הרוחות (יונג)", type:"normal",
+          img:"https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1200&auto=format&fit=crop",
+          speaker:"wi-gen",
+          text:"כוח זה אחריות. עכשיו נתרגל משפטים קצרים.",
+          objective:"דקדוק - am/is/are (בחירה).",
+          skill:"מטרה: לבחור את הפועל 'להיות' המתאים לגוף במשפט.",
+          gameType:"quiz",
+          questions:[
+            { q:"I ____ ready.", a:"am", options:["am","is","are"] },
+            { q:"He ____ strong.", a:"is", options:["am","is","are"] },
+            { q:"We ____ friends.", a:"are", options:["am","is","are"] },
+            { q:"They ____ happy.", a:"are", options:["is","are","am"] },
+            { q:"She ____ a student.", a:"is", options:["is","am","are"] },
+            { q:"You ____ my friend.", a:"are", options:["are","is","am"] }
+          ]
+        },
+        {
+          id:"sm_4", title:"אימון בטריטוריה", location:"אולם הספורט", type:"normal",
+          img:"https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1200&auto=format&fit=crop",
+          speaker:"ha-na",
+          text:"בטריטוריה צריך לזוז מהר. נתרגל פעלים.",
+          objective:"אוצר מילים - פעולות (התאמה).",
+          skill:"מטרה: לזהות פעלים בסיסיים באנגלית.",
+          gameType:"match",
+          vocabIds:["v_run","v_jump","v_go","v_stop","v_help","v_win"]
+        },
+        {
+          id:"sm_5", title:"מרדף לילי", location:"רחובות העיר", type:"normal",
+          img:"https://images.unsplash.com/photo-1517601278517-456741619dad?q=80&w=1200&auto=format&fit=crop",
+          speaker:"mo-tak",
+          text:"הרוח מתחבאת. צריך לדעת איפה היא - עם מילות יחס.",
+          objective:"דקדוק - מילות יחס (בחירה).",
+          skill:"מטרה: לבחור preposition מתאימה (in/on/under/behind).",
+          gameType:"quiz",
+          questions:[
+            { q:"It is ____ the car.", a:"behind", options:["behind","in","on"] },
+            { q:"The book is ____ the table.", a:"on", options:["on","under","in"] },
+            { q:"The cat is ____ the box.", a:"in", options:["in","on","behind"] },
+            { q:"The shoes are ____ the bed.", a:"under", options:["under","in","on"] },
+            { q:"Go ____ the door.", a:"to", options:["to","in","on"] },
+            { q:"Stay ____ me.", a:"with", options:["with","on","in"] }
+          ]
+        },
+        {
+          id:"sm_boss", title:"הקרב הסופי: היק-וו", location:"חצר בית הספר", type:"boss",
+          img:"https://images.unsplash.com/photo-1636690424423-e229712c4225?q=80&w=1200&auto=format&fit=crop",
+          speaker:"so-mun",
+          text:"הרוח השתלטה עליו. כדי לנצח - דקדוק מדויק ומהיר!",
+          objective:"בוס - am/is/are + טיימר.",
+          skill:"מטרה: תשובות מהירות בלי טעויות.",
+          gameType:"boss",
+          bossHp:120,
+          mechanic:{ id:"timer", text:"⏱️ טיימר: 9 שניות לכל שאלה" },
+          bossQuestions:[
+            { q:"I ____ a Counter.", a:"am", options:["am","is","are"] },
+            { q:"He ____ strong.", a:"is", options:["is","are","am"] },
+            { q:"We ____ ready.", a:"are", options:["are","am","is"] },
+            { q:"They ____ scared.", a:"are", options:["are","is","am"] },
+            { q:"She ____ happy.", a:"is", options:["is","am","are"] },
+            { q:"You ____ my friend.", a:"are", options:["are","is","am"] }
+          ]
+        }
+      ],
+
+      "ha-na": [
+        {
+          id:"hn_1", title:"לחישות בבניין", location:"בניין נטוש", type:"normal",
+          img:"https://images.unsplash.com/photo-1518386445358-00627e7d77ee?q=80&w=1200&auto=format&fit=crop",
+          speaker:"ha-na",
+          text:"אני שומעת לחישות. נתחיל במילים של משפחה.",
+          objective:"אוצר מילים - משפחה (התאמה).",
+          skill:"מטרה: חיבור אנגלית-עברית.",
+          gameType:"match",
+          vocabIds:["v_family","v_mother","v_father","v_sister","v_brother","v_baby"]
+        },
+        {
+          id:"hn_2", title:"קריאת זיכרונות", location:"העבר", type:"normal",
+          img:"https://images.unsplash.com/photo-1505312926838-89c0901e74f3?q=80&w=1200&auto=format&fit=crop",
+          speaker:"ha-na",
+          text:"הכל מעורפל. נתרגל מילים בסיסיות בבית.",
+          objective:"אוצר מילים - בית (הקלדה).",
+          skill:"מטרה: כתיבה באנגלית.",
+          gameType:"typing",
+          vocabIds:["v_home","v_book","v_friend","v_school","v_water","v_food"]
+        },
+        {
+          id:"hn_3", title:"הילדה האבודה", location:"גן משחקים", type:"normal",
+          img:"https://images.unsplash.com/photo-1606092195730-5d7b9af1ef4d?q=80&w=1200&auto=format&fit=crop",
+          speaker:"ha-na",
+          text:"זו נשמה אבודה. צריך לדבר על רגשות.",
+          objective:"אוצר מילים - רגשות (בחירה).",
+          skill:"מטרה: לבחור מילה מתאימה לפי עברית.",
+          gameType:"quiz",
+          questions:[
+            { q:"She is ____ (עצובה).", a:"sad", options:["sad","bad","mad"] },
+            { q:"Are you ____ (שמח)?", a:"happy", options:["happy","heavy","hot"] },
+            { q:"He is ____ (כועס).", a:"angry", options:["angry","hungry","ugly"] },
+            { q:"I am ____ (עייף).", a:"tired", options:["tired","red","bed"] },
+            { q:"It is ____ (רע).", a:"bad", options:["bad","bed","dad"] },
+            { q:"They are ____ (טובים).", a:"good", options:["good","god","go"] }
+          ]
+        },
+        {
+          id:"hn_4", title:"אימון טריטוריה", location:"חניה תת קרקעית", type:"normal",
+          img:"https://images.unsplash.com/photo-1596704017254-9b121068fb31?q=80&w=1200&auto=format&fit=crop",
+          speaker:"so-mun",
+          text:"הטריטוריה פתוחה. תתאמני על פעולות.",
+          objective:"אוצר מילים - פעולות (התאמה).",
+          skill:"מטרה: חיבור פעלים.",
+          gameType:"match",
+          vocabIds:["v_run","v_jump","v_go","v_stop","v_help","v_win"]
+        },
+        {
+          id:"hn_5", title:"החדר הנעול", location:"בית הרוח", type:"normal",
+          img:"https://images.unsplash.com/photo-1519681393798-2f61f2a55db8?q=80&w=1200&auto=format&fit=crop",
+          speaker:"ha-na",
+          text:"חפצים זזים. צריך לדעת איפה כל דבר נמצא.",
+          objective:"דקדוק - prepositions (בחירה).",
+          skill:"מטרה: in/on/under/behind.",
+          gameType:"quiz",
+          questions:[
+            { q:"Where is the book? It is ____ the table.", a:"on", options:["on","in","at"] },
+            { q:"Where is the box? It is ____ the bed.", a:"under", options:["under","on","in"] },
+            { q:"Where are you? I am ____ the room.", a:"in", options:["in","on","at"] },
+            { q:"Stand ____ me.", a:"behind", options:["behind","in","on"] },
+            { q:"Go ____ the door.", a:"to", options:["to","at","on"] },
+            { q:"Stay ____ me.", a:"with", options:["with","on","in"] }
+          ]
+        },
+        {
+          id:"hn_boss", title:"רוח המראה", location:"חנות מראות", type:"boss",
+          img:"https://images.unsplash.com/photo-1590422749896-1d374d81222e?q=80&w=1200&auto=format&fit=crop",
+          speaker:"ha-na",
+          text:"המראה מבלבלת. צריך have/has מדויק.",
+          objective:"בוס - have/has + 'מראה' (מערבב תשובות).",
+          skill:"מטרה: לבחור have/has לפי נושא המשפט.",
+          gameType:"boss",
+          bossHp:130,
+          mechanic:{ id:"shuffle", text:"🪞 המראה: התשובות מתערבבות כל 2 שניות" },
+          bossQuestions:[
+            { q:"She ____ a book.", a:"has", options:["has","have","is"] },
+            { q:"They ____ a car.", a:"have", options:["have","has","are"] },
+            { q:"He ____ a friend.", a:"has", options:["has","have","am"] },
+            { q:"We ____ power.", a:"have", options:["have","has","is"] },
+            { q:"It ____ a name.", a:"has", options:["has","have","are"] },
+            { q:"You ____ a family.", a:"have", options:["have","has","is"] }
+          ]
+        }
+      ]
+    };
+
+    const DEFAULT_CHAR = "so-mun";
+
+    const STORAGE_KEY = "jet4_grade4_v2";
+
+    const defaultState = {
+      charId: null,
+      levelIdx: 0,
+      hp: 100,
+      maxHp: 100,
+      souls: 0,
+      playerLevel: 1,
+      xp: 0,
+      xpNext: 100,
+      deck: ["v_school","v_teacher","v_student","v_friend","v_book","v_happy","v_sad","v_run","v_go","v_in","v_on"],
+      potions: { hint: 1, shield: 0, freeze: 0 },
+      mistakes: {},
+      due: {}
+    };
+
+    let state = structuredClone(defaultState);
+
+    let currentLevel = null;
+    let levelContext = {
+      mode: null,
+      queue: [],
+      bossHp: 0,
+      bossMax: 0,
+      selected: [],
+      matchedPairs: 0,
+      totalPairs: 0,
+      wrongThisLevel: 0,
+      shieldActive: false,
+      hintUsedThisQuestion: false,
+      timer: { active:false, durationMs:0, endsAt:0, raf:null, frozenUntil:0 }
+    };
+
+    // --- Helpers ---
+    const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+    const rand = (arr) => arr[Math.floor(Math.random()*arr.length)];
+    const shuffle = (arr) => arr.map(v=>({v, s:Math.random()})).sort((a,b)=>a.s-b.s).map(x=>x.v);
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function load() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        state = {...structuredClone(defaultState), ...parsed};
+        state.potions = {...defaultState.potions, ...(parsed.potions || {})};
+        state.mistakes = parsed.mistakes || {};
+        state.due = parsed.due || {};
+      } catch(e) {}
+    }
+
+    function addXP(amount) {
+      state.xp += amount;
+      while (state.xp >= state.xpNext) {
+        state.xp -= state.xpNext;
+        state.playerLevel++;
+        state.xpNext = Math.round(state.xpNext * 1.25);
+        state.maxHp = Math.min(140, state.maxHp + 5);
+        state.hp = state.maxHp;
+        state.souls += 80;
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+        toast(`עלית רמה! עכשיו רמה ${state.playerLevel} ⭐`);
+      }
+      save();
+      Game.updateHUD();
+    }
+
+    function toast(msg) {
+      const el = document.createElement("div");
+      el.className = "fixed top-20 left-1/2 -translate-x-1/2 z-[999] bg-slate-900/90 border border-slate-700 text-white px-4 py-3 rounded-2xl shadow-2xl font-bold";
+      el.innerText = msg;
+      document.body.appendChild(el);
+      setTimeout(()=>{ el.style.opacity = "0"; el.style.transition = "opacity .25s"; }, 1300);
+      setTimeout(()=>el.remove(), 1700);
+    }
+
+    function renderClickableText(text) {
+      const parts = text.split(" ");
+      return parts.map(p => {
+        const clean = p.replace(/[.,?!]/g,"");
+        const trans = DICTIONARY[clean.toLowerCase()];
+        if (!trans) return p;
+        return `<span class="clickable-word relative group" onclick="event.stopPropagation()">
+          ${p}
+          <span class="translation-tooltip hidden group-hover:block">${trans}</span>
+        </span>`;
+      }).join(" ");
+    }
+
+    // --- Deck logic ---
+    function unlockCard(cardId) {
+      if (!cardId) return;
+      if (!state.deck.includes(cardId)) state.deck.push(cardId);
+    }
+
+    function pickNewCardByRarity(rarity) {
+      const available = VOCAB.filter(v => v.rarity === rarity && !state.deck.includes(v.id));
+      if (available.length === 0) return null;
+      return rand(available).id;
+    }
+
+    function markMistake(vocabId) {
+      if (!vocabId) return;
+      state.mistakes[vocabId] = (state.mistakes[vocabId] || 0) + 1;
+      const now = Date.now();
+      const mins = [2, 6, 15, 45, 120, 360][Math.min(state.mistakes[vocabId]-1, 5)];
+      state.due[vocabId] = now + mins*60*1000;
+      save();
+    }
+
+    function dueCardsNow() {
+      const now = Date.now();
+      return Object.entries(state.due)
+        .filter(([id, t]) => t <= now && state.deck.includes(id))
+        .map(([id]) => id);
+    }
+
+    // --- Main engine ---
+    const Game = {
+      init() {
+        load();
+        this.updateHUD();
+
+        if (!state.charId) {
+          this.showView("tpl-char-select");
+          this.renderCharSelect();
+        } else {
+          this.showMap();
+        }
+      },
+
+      updateHUD() {
+        const char = CHARACTERS.find(c => c.id === state.charId);
+        if (char) document.getElementById("hud-avatar").src = char.avatar;
+        document.getElementById("hud-hp-text").innerText = `${clamp(state.hp,0,state.maxHp)}/${state.maxHp}`;
+        document.getElementById("hud-hp-bar").style.width = `${(clamp(state.hp,0,state.maxHp)/state.maxHp)*100}%`;
+        document.getElementById("hud-souls").innerText = state.souls;
+        document.getElementById("hud-deck-count").innerText = `(${state.deck.length})`;
+        document.getElementById("hud-xp").innerText = state.xp;
+        document.getElementById("hud-xp-next").innerText = state.xpNext;
+      },
+
+      showView(tplId) {
+        document.getElementById("story-modal").classList.add("hidden");
+        document.getElementById("msg-modal").classList.add("hidden");
+
+        const tpl = document.getElementById(tplId);
+        const main = document.getElementById("main-view");
+        main.innerHTML = "";
+        main.appendChild(tpl.content.cloneNode(true));
+      },
+
+      renderCharSelect() {
+        setTimeout(() => {
+          const grid = document.getElementById("char-grid");
+          if (!grid) return;
+          grid.innerHTML = CHARACTERS.map(c => `
+            <div onclick="Game.selectChar('${c.id}', event)" class="bg-slate-800 p-6 rounded-3xl flex items-center gap-6 cursor-pointer relative overflow-hidden group border-2 border-white/10 hover:border-red-500/70 transition">
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 opacity-0 group-hover:opacity-100 transition"></div>
+              <img src="${c.avatar}" class="w-24 h-24 rounded-full border-4 border-slate-600 bg-slate-900 object-cover shadow-lg group-hover:scale-105 transition">
+              <div>
+                <h3 class="text-2xl font-black text-white mb-1">${c.name}</h3>
+                <div class="text-xs text-red-400 font-bold uppercase mb-2 tracking-widest bg-slate-900/50 inline-block px-2 py-1 rounded">${c.role}</div>
+                <p class="text-slate-400 text-sm leading-relaxed">${c.desc}</p>
+              </div>
+            </div>
+          `).join("");
+        }, 30);
+      },
+
+      selectChar(id, ev) {
+        document.querySelectorAll("#char-grid > div").forEach(el => el.classList.remove("ring-2","ring-red-500"));
+        if (ev?.currentTarget) ev.currentTarget.classList.add("ring-2","ring-red-500");
+
+        const btn = document.getElementById("start-campaign-btn");
+        btn.disabled = false;
+        btn.className = "mt-12 px-12 py-5 rounded-2xl font-black text-2xl transition-all shadow-xl transform hover:scale-105 bg-gradient-to-r from-red-600 to-orange-600 text-white hover:from-red-500 hover:to-orange-500";
+        btn.onclick = () => {
+          state.charId = id;
+          state.levelIdx = 0;
+          state.hp = state.maxHp;
+          if (id === "ha-na") state.potions.hint += 1;
+          if (id === "mo-tak") state.potions.shield += 1;
+          if (id === "mae-ok") state.hp = Math.min(state.maxHp, state.hp + 10);
+
+          save();
+          this.updateHUD();
+          this.showMap();
+          confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+        };
+      },
+
+      changeCharacter() {
+        state.charId = null;
+        state.levelIdx = 0;
+        save();
+        document.body.classList.remove("territory");
+        this.showView("tpl-char-select");
+        this.renderCharSelect();
+        this.updateHUD();
+      },
+
+      showMap() {
+        document.body.classList.remove("territory");
+        this.showView("tpl-map");
+
+        const charId = state.charId || DEFAULT_CHAR;
+        const campaign = CAMPAIGNS[charId] || CAMPAIGNS[DEFAULT_CHAR];
+        const charName = CHARACTERS.find(c => c.id === charId)?.name || "צייד";
+        const container = document.getElementById("map-nodes");
+        document.getElementById("map-title").innerText = `המסע של ${charName}`;
+
+        container.innerHTML = campaign.map((level, idx) => {
+          let status = "locked";
+          if (idx < state.levelIdx) status = "completed";
+          else if (idx === state.levelIdx) status = "current";
+
+          const icon = level.type === "boss" ? "👹" : (status === "completed" ? "✅" : "⚔️");
+          const connector = idx > 0 ? `<div class="node-connector ${status !== "locked" ? "active" : ""}"></div>` : "";
+          const clickAction = (status !== "locked") ? `onclick="Game.openStory(${idx})"` : "";
+
+          return `
+            <div class="relative mb-16 flex flex-col items-center group">
+              ${connector}
+              <div ${clickAction} class="map-node ${status}">
+                ${icon}
+              </div>
+              <div class="mt-4 text-center bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 backdrop-blur-sm ${status === "locked" ? "opacity-50" : "shadow-lg"}">
+                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">שלב ${idx+1}</div>
+                <div class="font-black text-slate-200 text-lg leading-none">${level.title}</div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      },
+
+      openStory(idx) {
+        if (idx > state.levelIdx) return;
+
+        const charId = state.charId || DEFAULT_CHAR;
+        const campaign = CAMPAIGNS[charId] || CAMPAIGNS[DEFAULT_CHAR];
+        const level = campaign[idx];
+        currentLevel = level;
+
+        const modal = document.getElementById("story-modal");
+        document.getElementById("story-image").src = level.img;
+        document.getElementById("story-title").innerText = level.title;
+        document.getElementById("story-location").innerText = `📍 ${level.location}`;
+        document.getElementById("story-text").innerText = `"${level.text}"`;
+        document.getElementById("story-objective").innerText = level.objective;
+        document.getElementById("story-skill").innerText = level.skill || "";
+        document.getElementById("story-level-badge").innerText = `שלב ${idx+1}`;
+
+        const speakerId = level.speaker || charId;
+        const speaker = CHARACTERS.find(c => c.id === speakerId);
+        document.getElementById("story-speaker-img").src = speaker?.avatar || level.img;
+        document.getElementById("story-speaker-name").innerText = speaker?.name || "מדריך";
+
+        document.getElementById("story-potions").innerText =
+          `💡${state.potions.hint || 0} | 🛡️${state.potions.shield || 0} | 🧊${state.potions.freeze || 0}`;
+
+        document.getElementById("story-start-btn").onclick = () => {
+          modal.classList.add("hidden");
+          this.startLevel(level);
+        };
+
+        modal.classList.remove("hidden");
+      },
+
+      startLevel(level) {
+        if (level.type === "boss") document.body.classList.add("territory");
+        else document.body.classList.remove("territory");
+
+        this.showView("tpl-gameplay");
+        document.getElementById("game-stage-indicator").innerText = `שלב ${state.levelIdx + 1}/6`;
+
+        levelContext = {
+          mode: level.gameType,
+          queue: [],
+          bossHp: 0,
+          bossMax: 0,
+          selected: [],
+          matchedPairs: 0,
+          totalPairs: 0,
+          wrongThisLevel: 0,
+          shieldActive: false,
+          hintUsedThisQuestion: false,
+          timer: { active:false, durationMs:0, endsAt:0, raf:null, frozenUntil:0 }
+        };
+
+        if (state.charId === "ha-na") levelContext.freeHint = true;
+        if (state.charId === "mo-tak") levelContext.softFirstDamage = true;
+
+        document.getElementById("potion-hint-count").innerText = `(${state.potions.hint || 0}${levelContext.freeHint ? "+1" : ""})`;
+        document.getElementById("potion-shield-count").innerText = `(${state.potions.shield || 0})`;
+        document.getElementById("potion-freeze-count").innerText = `(${state.potions.freeze || 0})`;
+
+        document.getElementById("feedback").innerText = "";
+        document.getElementById("boss-hud").classList.add("hidden");
+        document.getElementById("timer-wrap").classList.add("hidden");
+
+        const container = document.getElementById("game-content");
+        container.innerHTML = "";
+
+        if (level.gameType === "boss") {
+          document.getElementById("boss-hud").classList.remove("hidden");
+          document.getElementById("boss-name").innerText = level.title;
+          document.getElementById("boss-mechanic").innerText = level.mechanic?.text || "";
+          levelContext.bossMax = level.bossHp || 120;
+          levelContext.bossHp = levelContext.bossMax;
+          document.getElementById("boss-bar").style.width = "100%";
+        }
+
+        if (level.gameType === "match") this.renderMatch(container, level.vocabIds);
+        if (level.gameType === "typing") this.renderTyping(container, level.vocabIds);
+        if (level.gameType === "quiz") this.renderQuiz(container, level.questions);
+        if (level.gameType === "boss") this.renderBoss(container, level.bossQuestions, level.mechanic);
+      },
+
+      // --- Potions ---
+      usePotion(type) {
+        const inGameplay = !!document.getElementById("game-content");
+        if (!inGameplay) return;
+
+        if (type === "shield") {
+          if ((state.potions.shield || 0) <= 0) { toast("אין מגן"); return; }
+          state.potions.shield--;
+          levelContext.shieldActive = true;
+          toast("מגן הופעל - טעות אחת לא פוגעת");
+          save();
+          this.updateHUD();
+          document.getElementById("potion-shield-count").innerText = `(${state.potions.shield || 0})`;
+          return;
+        }
+
+        if (type === "freeze") {
+          if ((state.potions.freeze || 0) <= 0) { toast("אין הקפאת זמן"); return; }
+          if (!levelContext.timer.active) { toast("אין טיימר כרגע"); return; }
+          state.potions.freeze--;
+          levelContext.timer.frozenUntil = Date.now() + 6000;
+          toast("הזמן הוקפא ל-6 שניות");
+          save();
+          this.updateHUD();
+          document.getElementById("potion-freeze-count").innerText = `(${state.potions.freeze || 0})`;
+          return;
+        }
+
+        if (type === "hint") {
+          if (levelContext.freeHint) {
+            levelContext.freeHint = false;
+            toast("רמז חינם הופעל");
+            this.applyHintToCurrentQuestion();
+            document.getElementById("potion-hint-count").innerText = `(${state.potions.hint || 0})`;
+            return;
+          }
+          if ((state.potions.hint || 0) <= 0) { toast("אין רמזים"); return; }
+          state.potions.hint--;
+          save();
+          this.updateHUD();
+          document.getElementById("potion-hint-count").innerText = `(${state.potions.hint || 0})`;
+          toast("רמז הופעל");
+          this.applyHintToCurrentQuestion();
+          return;
+        }
+      },
+
+      applyHintToCurrentQuestion() {
+        if (levelContext.hintUsedThisQuestion) { toast("כבר השתמשת ברמז בשאלה הזו"); return; }
+        levelContext.hintUsedThisQuestion = true;
+
+        const inp = document.getElementById("type-inp");
+        if (inp && inp.dataset.correct) {
+          const correct = inp.dataset.correct;
+          if (!inp.value.trim()) inp.value = correct.slice(0,1);
+          inp.focus();
+          return;
+        }
+
+        const buttons = [...document.querySelectorAll("[data-opt]")];
+        if (buttons.length) {
+          const wrongs = buttons.filter(b => b.dataset.correct !== "true" && !b.disabled);
+          if (wrongs.length) {
+            const w = rand(wrongs);
+            w.disabled = true;
+            w.classList.add("opacity-40","cursor-not-allowed");
+            w.innerText = "✖️";
+          }
+        }
+      },
+
+      // --- Match ---
+      renderMatch(container, vocabIds) {
+        const ids = vocabIds.map(id => { unlockCard(id); return id; });
+        save();
+
+        const pairs = ids.map((vid) => {
+          const c = getCard(vid);
+          return { key: vid, en: c.en, he: c.he, rarity: c.rarity };
+        });
+
+        const due = dueCardsNow().filter(id => !ids.includes(id)).slice(0, 2);
+        due.forEach(id => {
+          const c = getCard(id);
+          if (c) pairs.push({ key:id, en:c.en, he:c.he, rarity:c.rarity, due:true });
+        });
+
+        levelContext.totalPairs = pairs.length;
+        levelContext.matchedPairs = 0;
+        levelContext.selected = [];
+
+        let cards = [];
+        pairs.forEach(p => {
+          cards.push({ key:p.key, side:"en", text:p.en, rarity:p.rarity });
+          cards.push({ key:p.key, side:"he", text:p.he, rarity:p.rarity });
+        });
+        cards = shuffle(cards);
+
+        container.innerHTML = `
+          <div class="text-center w-full">
+            <div class="mb-5 text-slate-300 font-bold">התאימי זוגות - אנגלית עם עברית</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+              ${cards.map((c, idx) => `
+                <button
+                  class="game-card bg-slate-800 p-5 rounded-2xl text-center font-black text-white text-lg min-h-[84px] flex items-center justify-center"
+                  data-key="${c.key}" data-side="${c.side}" data-idx="${idx}" onclick="Game.onMatchClick(this)">
+                  ${c.text}
+                </button>
+              `).join("")}
+            </div>
+            <div class="mt-6 text-slate-500 text-sm font-bold">
+              התקדמות: <span id="match-progress" class="text-white">${levelContext.matchedPairs}</span> / ${levelContext.totalPairs}
+            </div>
+          </div>
+        `;
+      },
+
+      onMatchClick(btn) {
+        if (btn.classList.contains("matched") || btn.classList.contains("opacity-20")) return;
+        if (levelContext.selected.includes(btn)) return;
+
+        btn.classList.add("selected");
+        levelContext.selected.push(btn);
+
+        if (levelContext.selected.length < 2) return;
+
+        const [a,b] = levelContext.selected;
+        const aKey = a.dataset.key, bKey = b.dataset.key;
+        const aSide = a.dataset.side, bSide = b.dataset.side;
+
+        if (aKey === bKey && aSide !== bSide) {
+          a.classList.remove("selected"); b.classList.remove("selected");
+          a.classList.add("matched"); b.classList.add("matched");
+          addXP(12); state.souls += 8;
+          setTimeout(() => { a.classList.add("opacity-20"); b.classList.add("opacity-20"); }, 250);
+          levelContext.matchedPairs++;
+          document.getElementById("match-progress").innerText = levelContext.matchedPairs;
+          if (levelContext.matchedPairs >= levelContext.totalPairs) this.finishLevel(true);
+        } else {
+          a.classList.add("wrong"); b.classList.add("wrong");
+          markMistake(aKey); markMistake(bKey);
+          this.applyDamage(10);
+          setTimeout(() => {
+            a.classList.remove("selected","wrong");
+            b.classList.remove("selected","wrong");
+          }, 520);
+        }
+        levelContext.selected = [];
+      },
+
+      // --- Typing ---
+      renderTyping(container, vocabIds) {
+        vocabIds.forEach(id => unlockCard(id));
+        save();
+        const base = shuffle(vocabIds.slice());
+        const due = shuffle(dueCardsNow().filter(id => !base.includes(id))).slice(0,2);
+        levelContext.queue = base.concat(due);
+        this.nextTyping(container);
+      },
+
+      nextTyping(container) {
+        levelContext.hintUsedThisQuestion = false;
+        if (!levelContext.queue.length) return this.finishLevel(true);
+
+        const vid = levelContext.queue[0];
+        const c = getCard(vid);
+        if (!c) { levelContext.queue.shift(); return this.nextTyping(container); }
+
+        const fromDeck = shuffle(state.deck.filter(x => x !== vid)).slice(0, 4).map(id => getCard(id)?.en).filter(Boolean);
+        let bank = shuffle([c.en, ...fromDeck]).slice(0, 5);
+        if (!bank.includes(c.en)) bank[0] = c.en;
+        bank = shuffle(bank);
+
+        container.innerHTML = `
+          <div class="text-center w-full max-w-md">
+            <div class="text-slate-400 font-bold mb-2">כתבי באנגלית:</div>
+            <div class="text-5xl font-black mb-6">${c.he}</div>
+
+            <div class="flex flex-wrap justify-center gap-2 mb-6">
+              ${bank.map(w => `
+                <button class="btn px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-black"
+                  onclick="document.getElementById('type-inp').value='${w.replace(/'/g,"\\'")}'; document.getElementById('type-inp').focus()">
+                  ${w}
+                </button>
+              `).join("")}
+            </div>
+
+            <input id="type-inp" data-correct="${c.en}" type="text"
+              class="bg-transparent border-b-4 border-slate-600 text-center text-3xl text-white p-3 outline-none focus:border-red-500 w-full mb-5 font-black"
+              dir="ltr" placeholder="הקלידי כאן...">
+
+            <button class="btn bg-red-600 hover:bg-red-500 text-white w-full py-4 rounded-2xl font-black text-xl shadow-lg"
+              onclick="Game.checkTyping()">
+              בדיקה
+            </button>
+            <div class="mt-4 text-slate-500 text-sm font-bold">נשארו: <span class="text-white">${levelContext.queue.length}</span></div>
+          </div>
+        `;
+        setTimeout(()=>document.getElementById("type-inp")?.focus(), 60);
+      },
+
+      checkTyping() {
+        const inp = document.getElementById("type-inp");
+        if (!inp) return;
+        const correct = inp.dataset.correct || "";
+        const val = (inp.value || "").trim();
+
+        if (val.toLowerCase() === correct.toLowerCase()) {
+          this.feedback("נכון! ✨", "good");
+          addXP(18); state.souls += 12;
+          levelContext.queue.shift();
+          save(); this.updateHUD();
+          setTimeout(() => this.nextTyping(document.getElementById("game-content")), 700);
+        } else {
+          this.feedback("לא בדיוק... ❌", "bad");
+          markMistake(levelContext.queue[0]);
+          this.applyDamage(10);
+        }
+      },
+
+      // --- Quiz ---
+      renderQuiz(container, questions) {
+        levelContext.queue = shuffle(questions.slice());
+        this.nextQuiz(container);
+      },
+
+      nextQuiz(container) {
+        levelContext.hintUsedThisQuestion = false;
+        if (!levelContext.queue.length) return this.finishLevel(true);
+
+        const q = levelContext.queue[0];
+        const displayQ = renderClickableText(q.q).replace("____", `<span class="text-red-400 border-b-2 border-red-400 mx-1 inline-block min-w-[46px]"></span>`);
+        const opts = shuffle(q.options.slice());
+
+        container.innerHTML = `
+          <div class="text-center w-full max-w-md">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 mb-6 relative">
+              <div class="text-2xl font-black text-white leading-relaxed" dir="ltr">${displayQ}</div>
+              <div class="text-[10px] text-slate-500 mt-2 text-right w-full font-bold">לחצי על מילה לתרגום</div>
+            </div>
+            <div class="grid gap-3">
+              ${opts.map(opt => {
+                const isCorrect = (opt === q.a);
+                return `
+                  <button data-opt="1" data-correct="${isCorrect}" class="btn bg-slate-700 hover:bg-slate-600 p-4 rounded-2xl font-black text-lg text-slate-200 border border-slate-600 transition hover:border-red-400"
+                    onclick="Game.checkQuiz('${opt}', '${q.a.replace(/'/g,"\\'")}')">
+                    ${opt}
+                  </button>
+                `;
+              }).join("")}
+            </div>
+            <div class="mt-4 text-slate-500 text-sm font-bold">נשארו: <span class="text-white">${levelContext.queue.length}</span></div>
+          </div>
+        `;
+      },
+
+      checkQuiz(ans, correct) {
+        if (ans === correct) {
+          this.feedback("בול! 🎯", "good");
+          addXP(16); state.souls += 10;
+          levelContext.queue.shift();
+          save(); this.updateHUD();
+          setTimeout(() => this.nextQuiz(document.getElementById("game-content")), 650);
+        } else {
+          this.feedback("אופס... 😅", "bad");
+          this.applyDamage(10);
+        }
+      },
+
+      // --- Boss ---
+      renderBoss(container, bossQuestions, mechanic) {
+        levelContext.queue = bossQuestions.map(x => ({...x}));
+        levelContext.bossMax = currentLevel.bossHp || 120;
+        levelContext.bossHp = levelContext.bossMax;
+        document.getElementById("boss-bar").style.width = "100%";
+        levelContext.mechanic = mechanic?.id || null;
+
+        if (levelContext.mechanic === "timer") {
+          document.getElementById("timer-wrap").classList.remove("hidden");
+          levelContext.timer.active = true;
+          levelContext.timer.durationMs = 9000;
+        }
+        this.nextBoss(container);
+      },
+
+      nextBoss(container) {
+        levelContext.hintUsedThisQuestion = false;
+        if (!levelContext.queue.length || levelContext.bossHp <= 0) return this.finishLevel(true);
+
+        const q = levelContext.queue[0];
+        const displayQ = renderClickableText(q.q).replace("____", `<span class="text-red-400 border-b-2 border-red-400 mx-1">____</span>`);
+        const opts = shuffle((q.options || [q.a]).slice());
+
+        container.innerHTML = `
+          <div class="text-center w-full max-w-md">
+            <div class="text-3xl font-black text-white mb-6" dir="ltr">${displayQ}</div>
+            <div class="grid gap-3">
+              ${opts.map(opt => {
+                const isCorrect = (opt === q.a);
+                return `
+                  <button data-opt="1" data-correct="${isCorrect}" class="btn bg-slate-800 hover:bg-slate-700 border border-red-500/35 px-6 py-4 rounded-2xl text-xl font-black transition"
+                    onclick="Game.checkBoss('${opt}', '${q.a}')">
+                    ${opt}
+                  </button>
+                `;
+              }).join("")}
+            </div>
+            <div class="mt-5 text-slate-500 text-sm font-bold">בוס: <span class="text-white">${Math.max(0,Math.round(levelContext.bossHp))}</span> HP</div>
+          </div>
+        `;
+
+        if (levelContext.mechanic === "shuffle") {
+          if (levelContext.shuffleInterval) clearInterval(levelContext.shuffleInterval);
+          levelContext.shuffleInterval = setInterval(() => {
+            const grid = container.querySelector(".grid");
+            if (!grid) return;
+            const children = [...grid.children];
+            shuffle(children).forEach(ch => grid.appendChild(ch));
+          }, 2000);
+        }
+
+        if (levelContext.timer.active) {
+          this.startTimer(() => {
+            this.feedback("נגמר הזמן! ⏱️", "bad");
+            this.applyDamage(12);
+            levelContext.bossHp = Math.min(levelContext.bossMax, levelContext.bossHp + 6);
+            document.getElementById("boss-bar").style.width = `${(levelContext.bossHp/levelContext.bossMax)*100}%`;
+            levelContext.queue.shift();
+            this.nextBoss(document.getElementById("game-content"));
+          });
+        }
+      },
+
+      checkBoss(ans, correct) {
+        this.stopTimer();
+        if (ans === correct) {
+          this.feedback("פגיעה! 💥", "good");
+          addXP(22); state.souls += 14;
+          const dmg = Math.ceil(levelContext.bossMax / (currentLevel.bossQuestions.length + 1));
+          levelContext.bossHp = Math.max(0, levelContext.bossHp - dmg);
+          document.getElementById("boss-bar").style.width = `${(levelContext.bossHp/levelContext.bossMax)*100}%`;
+          levelContext.queue.shift();
+
+          if (levelContext.bossHp <= 0) {
+            confetti({ particleCount: 220, spread: 120, origin: { y: 0.6 } });
+            return this.finishLevel(true);
+          }
+          setTimeout(() => this.nextBoss(document.getElementById("game-content")), 650);
+        } else {
+          this.feedback("הרוח צוחקת... 👻", "bad");
+          this.applyDamage(15);
+        }
+      },
+
+      // --- Timer helpers ---
+      startTimer(onTimeout) {
+        const wrap = document.getElementById("timer-wrap");
+        if (!wrap) return;
+        const bar = document.getElementById("timer-bar");
+        const now = Date.now();
+        levelContext.timer.endsAt = now + levelContext.timer.durationMs;
+
+        const tick = () => {
+          const tNow = Date.now();
+          if (levelContext.timer.frozenUntil && tNow < levelContext.timer.frozenUntil) {
+            levelContext.timer.raf = requestAnimationFrame(tick);
+            return;
+          }
+          const remain = levelContext.timer.endsAt - tNow;
+          const ratio = clamp(remain / levelContext.timer.durationMs, 0, 1);
+          bar.style.width = `${ratio * 100}%`;
+
+          if (remain <= 0) {
+            levelContext.timer.active = false;
+            onTimeout?.();
+            return;
+          }
+          levelContext.timer.raf = requestAnimationFrame(tick);
+        };
+        bar.style.width = "100%";
+        levelContext.timer.active = true;
+        if (levelContext.timer.raf) cancelAnimationFrame(levelContext.timer.raf);
+        levelContext.timer.raf = requestAnimationFrame(tick);
+      },
+
+      stopTimer() {
+        if (levelContext.timer?.raf) cancelAnimationFrame(levelContext.timer.raf);
+        levelContext.timer.raf = null;
+        const bar = document.getElementById("timer-bar");
+        if (bar) bar.style.width = "100%";
+      },
+
+      // --- Damage & Modals ---
+      applyDamage(amount) {
+        if (levelContext.shieldActive) {
+          levelContext.shieldActive = false;
+          toast("המגן ספג את הטעות 🛡️");
+          return;
+        }
+        if (levelContext.softFirstDamage && levelContext.wrongThisLevel === 0) {
+          amount = Math.ceil(amount * 0.5);
+        }
+
+        levelContext.wrongThisLevel++;
+        state.hp = Math.max(0, state.hp - amount);
+        save();
+        this.updateHUD();
+
+        if (state.hp <= 0) {
+          this.showModal("נגמר הכוח...", "הרוח ניצחה הפעם. נסי שוב מההתחלה.", [
+            { text: "חזרה למפה", click: () => {
+                state.hp = state.maxHp;
+                save();
+                this.updateHUD();
+                this.showMap();
+              }, primary:true }
+          ]);
+        }
+      },
+
+      feedback(text, type) {
+        const el = document.getElementById("feedback");
+        if (!el) return;
+        el.innerText = text;
+        el.className = `text-3xl font-black transition-all duration-300 transform scale-110 ${type === "good" ? "text-emerald-400" : "text-red-500"}`;
+        setTimeout(() => { if (el) { el.innerText = ""; el.className = ""; } }, 900);
+      },
+
+      // --- Finish / Rewards ---
+      finishLevel(success) {
+        this.stopTimer();
+        if (levelContext.shuffleInterval) clearInterval(levelContext.shuffleInterval);
+
+        if (!success) return this.showMap();
+
+        if (state.charId === "mae-ok") state.hp = Math.min(state.maxHp, state.hp + 8);
+
+        state.souls += 40;
+        addXP(25);
+        save();
+        this.updateHUD();
+        this.showView("tpl-rewards");
+        this.renderRewards();
+        confetti({ particleCount: 140, spread: 90, origin: { y: 0.6 } });
+      },
+
+      renderRewards() {
+        const grid = document.getElementById("rewards-grid");
+        const rareOrEpic = Math.random() > 0.88 ? "epic" : "rare";
+        const cardId = pickNewCardByRarity(rareOrEpic) || pickNewCardByRarity("rare") || pickNewCardByRarity("common");
+
+        const choices = [
+          {
+            title: `🃏 קלף חדש (${cardId ? getCard(cardId).rarity : "souls"})`,
+            desc: cardId ? `${getCard(cardId).en} - ${getCard(cardId).he}` : "אין עוד קלפים זמינים - תקבלי נשמות",
+            apply: () => { if (cardId) unlockCard(cardId); else state.souls += 120; }
+          },
+          {
+            title: "🧪 שיקוי חכם",
+            desc: "קבלי 1 רמז + 1 מגן (מעולה לבוסים)",
+            apply: () => { state.potions.hint++; state.potions.shield++; }
+          },
+          {
+            title: "❤️ ריפוי",
+            desc: "ממלא 30 כוח (HP) - כדי להמשיך בלי להיתקע",
+            apply: () => { state.hp = Math.min(state.maxHp, state.hp + 30); }
+          }
+        ];
+
+        const items = shuffle(choices);
+        levelContext.rewardChosen = false;
+        levelContext.rewardChoices = items;
+
+        grid.innerHTML = items.map((c, idx) => `
+          <button class="btn text-right bg-slate-800 hover:bg-slate-700 border border-slate-700 p-5 rounded-2xl shadow-lg"
+            onclick="Game.chooseReward(${idx})">
+            <div class="text-xl font-black text-white">${c.title}</div>
+            <div class="text-slate-400 text-sm mt-2">${c.desc}</div>
+            <div class="mt-3 text-slate-300 font-black">לבחור ➜</div>
+          </button>
+        `).join("");
+      },
+
+      chooseReward(idx) {
+        if (levelContext.rewardChosen) return;
+        levelContext.rewardChosen = true;
+        levelContext.rewardChoices[idx].apply();
+        save();
+        this.updateHUD();
+        toast("פרס נבחר!");
+        document.querySelectorAll("#rewards-grid > button").forEach((b, i) => {
+          if (i !== idx) b.classList.add("opacity-50");
+          b.disabled = true;
+        });
+      },
+
+      continueAfterRewards() {
+        if (!levelContext.rewardChosen) { toast("בחרי פרס לפני שממשיכים"); return; }
+        const charId = state.charId || DEFAULT_CHAR;
+        const campaign = CAMPAIGNS[charId] || CAMPAIGNS[DEFAULT_CHAR];
+
+        if (state.levelIdx + 1 >= campaign.length) {
+          this.showView("tpl-victory");
+          document.getElementById("victory-char-name").innerText = CHARACTERS.find(c=>c.id===charId)?.name || "הדמות";
+          document.getElementById("victory-souls").innerText = state.souls;
+          document.getElementById("victory-level").innerText = state.playerLevel;
+          document.getElementById("victory-restart-btn").onclick = () => this.changeCharacter();
+          return;
+        }
+
+        state.levelIdx++;
+        save();
+        this.updateHUD();
+        this.showMap();
+      },
+
+      // --- Deck / Shop / Profile ---
+      showDeck() {
+        this.showView("tpl-deck");
+        const grid = document.getElementById("deck-grid");
+        const rarityOrder = { epic:0, rare:1, common:2 };
+        const cards = state.deck.map(id => getCard(id)).filter(Boolean)
+          .sort((a,b) => (rarityOrder[a.rarity]-rarityOrder[b.rarity]) || a.topic.localeCompare(b.topic));
+
+        grid.innerHTML = cards.map(c => `
+          <div class="bg-slate-800/70 p-4 rounded-2xl border-l-4 rarity-${c.rarity}">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="text-white font-black text-lg">${c.en}</div>
+                <div class="text-slate-300 text-sm font-bold">${c.he}</div>
+                <div class="text-slate-500 text-xs mt-2 font-bold uppercase">${c.topic}</div>
+              </div>
+              <div class="text-xs font-black px-2 py-1 rounded-full border border-white/10 bg-slate-900/50">
+                ${c.rarity.toUpperCase()}
+              </div>
+            </div>
+          </div>
+        `).join("");
+      },
+
+      openPack() {
+        if (state.souls < 200) { toast("אין מספיק נשמות לחבילה (צריך 200)"); return; }
+        state.souls -= 200;
+
+        const poolCommon = VOCAB.filter(v => v.rarity==="common" && !state.deck.includes(v.id));
+        const poolRare = VOCAB.filter(v => v.rarity==="rare" && !state.deck.includes(v.id));
+        const poolEpic = VOCAB.filter(v => v.rarity==="epic" && !state.deck.includes(v.id));
+
+        const got = [];
+        const pick = (p,fb=[]) => { if(p.length) return rand(p).id; for(let f of fb) if(f.length) return rand(f).id; return null; };
+        const roll = Math.random();
+        const thirdRarity = roll > 0.92 ? "epic" : (roll > 0.55 ? "rare" : "common");
+
+        got.push(pick(poolCommon, [poolRare, poolEpic]));
+        got.push(pick(poolCommon.filter(x=>x.id!==got[0]), [poolRare, poolEpic]));
+        if (thirdRarity==="epic") got.push(pick(poolEpic,[poolRare,poolCommon]));
+        else if (thirdRarity==="rare") got.push(pick(poolRare,[poolEpic,poolCommon]));
+        else got.push(pick(poolCommon.filter(x=>!got.includes(x.id)),[poolRare,poolEpic]));
+
+        got.filter(Boolean).forEach(id => unlockCard(id));
+        save(); this.updateHUD(); this.showDeck();
+        confetti({ particleCount: 140, spread: 80, origin: { y: 0.65 } });
+        const names = got.filter(Boolean).map(id => getCard(id)?.en).join(", ");
+        toast("חבילה נפתחה! קיבלת: " + (names || "נשמות נוספות"));
+      },
+
+      showShop() {
+        this.showView("tpl-shop");
+        document.getElementById("shop-inventory").innerText = `💡 רמז: ${state.potions.hint || 0} | 🛡️ מגן: ${state.potions.shield || 0} | 🧊 הקפאת זמן: ${state.potions.freeze || 0}`;
+      },
+
+      buyPotion(type, cost) {
+        if (state.souls < cost) { toast("אין מספיק נשמות"); return; }
+        state.souls -= cost;
+        state.potions[type]++;
+        save(); this.updateHUD(); this.showShop();
+        toast("נרכש!");
+      },
+
+      // --- Modals logic replacing alerts ---
+      showModal(title, body, actions=[]) {
+        const m = document.getElementById("msg-modal");
+        document.getElementById("msg-title").innerText = title;
+        document.getElementById("msg-body").innerHTML = body; // Allow HTML
+        const actDiv = document.getElementById("msg-actions");
+        actDiv.innerHTML = "";
+        actions.forEach(a => {
+          const btn = document.createElement("button");
+          btn.innerText = a.text;
+          btn.className = `btn px-6 py-2 rounded-xl font-bold border ${a.primary ? 'bg-red-600 border-red-500 text-white' : 'bg-slate-800 border-slate-600 text-slate-300'}`;
+          btn.onclick = () => { m.classList.add("hidden"); a.click?.(); };
+          actDiv.appendChild(btn);
+        });
+        m.classList.remove("hidden");
+      },
+
+      closeModal(id) {
+        document.getElementById(id).classList.add("hidden");
+      },
+
+      showProfile() {
+        const char = CHARACTERS.find(c => c.id === state.charId);
+        const html = `
+          <div class="flex items-center justify-center gap-4 mb-4">
+            <img src="${char?.avatar || ''}" class="w-16 h-16 rounded-full border-2 border-slate-500">
+            <div class="text-right">
+              <div class="text-xl font-black text-white">${char?.name || "לא נבחר"}</div>
+              <div class="text-sm text-slate-400">רמה ${state.playerLevel}</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-sm text-slate-300">
+            <div class="bg-slate-800 p-2 rounded">XP: ${state.xp}/${state.xpNext}</div>
+            <div class="bg-slate-800 p-2 rounded">כוח: ${state.hp}/${state.maxHp}</div>
+            <div class="bg-slate-800 p-2 rounded">נשמות: ${state.souls}</div>
+            <div class="bg-slate-800 p-2 rounded">קלפים: ${state.deck.length}</div>
+          </div>
+        `;
+        this.showModal("פרופיל שחקן", html, [{text:"סגור"}]);
+      },
+
+      toggleSettings() {
+        this.showModal(
+          "הגדרות",
+          "האם את בטוחה שאת רוצה לאפס את המשחק? כל ההתקדמות תימחק.",
+          [
+            { text: "ביטול" },
+            { text: "כן, אפס משחק", primary:true, click: () => {
+                localStorage.removeItem(STORAGE_KEY);
+                state = structuredClone(defaultState);
+                this.updateHUD();
+                document.body.classList.remove("territory");
+                this.showView("tpl-char-select");
+                this.renderCharSelect();
+            }}
+          ]
+        );
+      }
+    };
+
+    window.Game = Game;
+    window.addEventListener("load", () => Game.init());
+  </script>
+</body>
+</html>
