@@ -316,19 +316,19 @@ const WORLDS=[
 
 const CHARS=[
   {id:"leila",name:"לילה",role:"הגיבורה",e:"⚔️",
-   av:"https://api.dicebear.com/7.x/adventurer/svg?seed=Leila&backgroundColor=ff6b6b80",
+   av:"https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop",
    c:"#ff6b6b",cg:"rgba(255,107,107,.4)",
    ability:"extra_heart",aName:"לב נוסף",aDesc:"4 לבבות במקום 3 בכל שלב"},
   {id:"maya",name:"מאיה",role:"המרפאה",e:"💚",
-   av:"https://api.dicebear.com/7.x/adventurer/svg?seed=Maya&backgroundColor=4ecdc480",
+   av:"https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop",
    c:"#4ecdc4",cg:"rgba(78,205,196,.4)",
    ability:"heal_boss",aName:"ריפוי קרב",aDesc:"מקבלת ❤️ חזרה אחרי ניצחון בוס"},
   {id:"shira",name:"שירה",role:"הקוסמת",e:"✨",
-   av:"https://api.dicebear.com/7.x/adventurer/svg?seed=Shira&backgroundColor=f7b73180",
+   av:"https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=200&h=200&fit=crop",
    c:"#f7b731",cg:"rgba(247,183,49,.4)",
    ability:"double_gems",aName:"יהלומים x2",aDesc:"מרוויחה יהלומים כפולים מכל תשובה"},
   {id:"dana",name:"דנה",role:"המהירה",e:"⚡",
-   av:"https://api.dicebear.com/7.x/adventurer/svg?seed=Dana&backgroundColor=a55eea80",
+   av:"https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop",
    c:"#a55eea",cg:"rgba(165,94,234,.4)",
    ability:"speed_bonus",aName:"זמן נוסף",aDesc:"3 שניות נוספות בשלבי מהירות"},
 ];
@@ -505,7 +505,7 @@ function renderChars(){
       ${CHARS.map(ch=>`
       <div class="char-card ${pick===ch.id?'picked':''}" style="--c:${ch.c};--cg:${ch.cg};" onclick="pickChar('${ch.id}')">
         ${pick===ch.id?`<div style="position:absolute;top:8px;left:8px;background:${ch.c};border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;z-index:1;">✓</div>`:''}
-        <img src="${ch.av}" style="width:62px;height:62px;border-radius:50%;border:3px solid ${ch.c};display:block;margin-bottom:8px;background:rgba(255,255,255,.08);" onerror="this.style.fontSize='2rem';this.style.textAlign='center';this.textContent='${ch.e}';">
+        <img src="${ch.av}" style="width:62px;height:62px;border-radius:50%;border:3px solid ${ch.c};display:block;margin-bottom:8px;background:rgba(255,255,255,.08);object-fit:cover;" onerror="this.style.fontSize='2rem';this.style.textAlign='center';this.textContent='${ch.e}';">
         <div class="ff" style="color:${ch.c};font-size:1rem;">${ch.name}</div>
         <div style="font-size:.7rem;color:rgba(255,255,255,.45);font-weight:700;margin-bottom:6px;">${ch.role}</div>
         <div style="font-size:.7rem;background:rgba(255,255,255,.07);border-radius:10px;padding:6px 8px;color:rgba(255,255,255,.7);font-weight:700;line-height:1.4;"><span style="color:${ch.c}">⚡ ${ch.aName}:</span><br>${ch.aDesc}</div>
@@ -531,7 +531,7 @@ function renderMap(){
   const ch=getChar(),ts=totalStars(),ms=WORLDS.reduce((s,w)=>s+w.levels.length*3,0);
   return `<div class="screen" style="background:radial-gradient(ellipse at 50% 0%,#0f0a28 0%,#08081a 70%);padding-bottom:40px;">
     <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(0,0,0,.55);border-bottom:1px solid rgba(255,255,255,.07);">
-      <img src="${ch.av}" style="width:40px;height:40px;border-radius:50%;border:2px solid ${ch.c};background:rgba(255,255,255,.08);flex-shrink:0;" onerror="this.style.fontSize='1.4rem';this.style.textAlign='center';this.textContent='${ch.e}';">
+      <img src="${ch.av}" style="width:40px;height:40px;border-radius:50%;border:2px solid ${ch.c};background:rgba(255,255,255,.08);flex-shrink:0;object-fit:cover;" onerror="this.style.fontSize='1.4rem';this.style.textAlign='center';this.textContent='${ch.e}';">
       <div style="flex:1;min-width:0;">
         <div class="ff" style="color:${ch.c};font-size:.9rem;">${ch.name} · רמה ${ST.lvl}</div>
         <div class="xp-bar" style="width:100px;"><div class="xp-fill" style="width:${ST.xp/ST.xpNext*100}%;"></div></div>
@@ -949,8 +949,8 @@ function renderBoss(){
             <div class="hp-bar" style="background:rgba(255,255,255,.1);">
               <div class="hp-fill" style="width:${G.hearts/G.maxH*100}%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>
             </div>
-            <div class="fighter-emoji" id="player-emoji" style="animation:float 2.5s ease infinite;">${ch.e}</div>
-            <div class="ff" style="font-size:.82rem;color:${ch.c};">${ch.name}</div>
+            <img src="${ch.av}" class="fighter-emoji" id="player-emoji" style="width:75px;height:75px;border-radius:50%;border:3px solid ${ch.c};object-fit:cover;animation:float 2.5s ease infinite;box-shadow:0 0 20px ${ch.cg};" onerror="this.style.fontSize='3.5rem';this.style.textAlign='center';this.textContent='${ch.e}';this.style.border='none';this.style.background='transparent';">
+            <div class="ff" style="font-size:.82rem;color:${ch.c};margin-top:6px;">${ch.name}</div>
           </div>
           <div class="vs-divider">VS</div>
           <div class="fighter-box">
@@ -1274,7 +1274,7 @@ function renderProfile(){
     </div>
     <div style="padding:18px 14px 0;">
       <div style="background:linear-gradient(135deg,${ch.c}22,${ch.c}08);border:1.5px solid ${ch.c}44;border-radius:28px;padding:22px;text-align:center;margin-bottom:14px;">
-        <img src="${ch.av}" style="width:68px;height:68px;border-radius:50%;border:3px solid ${ch.c};background:rgba(255,255,255,.08);margin-bottom:10px;">
+        <img src="${ch.av}" style="width:68px;height:68px;border-radius:50%;border:3px solid ${ch.c};background:rgba(255,255,255,.08);margin-bottom:10px;object-fit:cover;">
         <div class="ff" style="font-size:1.6rem;color:${ch.c};">${ch.name}</div>
         <div style="color:rgba(255,255,255,.45);font-size:.82rem;font-weight:700;margin-bottom:12px;">${ch.role} · רמה ${ST.lvl}</div>
         <div class="xp-bar" style="height:10px;"><div class="xp-fill" style="width:${ST.xp/ST.xpNext*100}%;"></div></div>
