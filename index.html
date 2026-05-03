@@ -1,1564 +1,1305 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JET 4 - ציידות השדים של הקיי-פופ</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>⚔️ English Quest – Jet 2 Unit 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Heebo:wght@400;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{font-family:'Heebo',sans-serif;direction:rtl;background:#08081a;color:#fff;min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;}
+.ff{font-family:'Fredoka One',cursive;}
+.app-root{max-width:480px;margin:0 auto;min-height:100vh;position:relative;}
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;900&display=swap" rel="stylesheet">
+/* ── ANIMATIONS ──────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes screenShake{0%,100%{transform:translate(0,0)}10%{transform:translate(-8px,-4px)}20%{transform:translate(8px,4px)}30%{transform:translate(-6px,3px)}40%{transform:translate(6px,-3px)}50%{transform:translate(-8px,4px)}60%{transform:translate(8px,-4px)}70%{transform:translate(-4px,2px)}80%{transform:translate(4px,-2px)}90%{transform:translate(-6px,4px)}}
+@keyframes hitFlash{0%,100%{filter:none; transform:scale(1);}40%{filter:brightness(4) hue-rotate(30deg) saturate(2); transform:scale(0.85);}}
+@keyframes bossAngry{0%,100%{filter:none}50%{filter:hue-rotate(25deg) brightness(1.4) saturate(1.8)}}
+@keyframes bossEnrage{0%,100%{filter:hue-rotate(0deg) brightness(1)}50%{filter:hue-rotate(15deg) brightness(1.6) saturate(2)}}
+@keyframes bossDeath{0%{transform:scale(1) rotate(0);opacity:1}30%{transform:scale(1.5) rotate(-10deg);filter:brightness(4)}70%{transform:scale(0.8) rotate(20deg);opacity:.5}100%{transform:scale(0) rotate(45deg);opacity:0}}
+@keyframes gemFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--gx),var(--gy)) scale(.3)}}
+@keyframes dmgNum{0%{opacity:1;transform:translateY(0) scale(1.2)}100%{opacity:0;transform:translateY(-60px) scale(.7)}}
+@keyframes comboFlash{0%,100%{opacity:0;transform:scale(.8)}20%,80%{opacity:1;transform:scale(1)}}
+@keyframes rainbow{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+@keyframes powerGlow{0%,100%{box-shadow:0 0 8px #f59e0b}50%{box-shadow:0 0 28px #f59e0b,0 0 56px #ef4444}}
+@keyframes chestBounce{0%,100%{transform:scale(1) rotate(0)}30%{transform:scale(1.15) rotate(-8deg)}60%{transform:scale(1.1) rotate(6deg)}}
+@keyframes cardReveal{0%{transform:translateY(40px) scale(.6) rotate(var(--cr));opacity:0}100%{transform:translateY(0) scale(1) rotate(0);opacity:1}}
+@keyframes goldPulse{0%,100%{box-shadow:0 0 12px #f59e0b44}50%{box-shadow:0 0 40px #f59e0b,0 0 70px #fbbf24}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes streakFire{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.1) rotate(5deg)}}
+@keyframes specialWarning{0%,100%{background:rgba(239,68,68,.06)}50%{background:rgba(239,68,68,.22)}}
+@keyframes pulseRed{0%,100%{filter:none}50%{filter:brightness(1.2) saturate(1.4) hue-rotate(-20deg)}}
+@keyframes superReady{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
+@keyframes pDash{0%,100%{transform:translateX(0)}50%{transform:translateX(-40px) scale(1.15)}}
+@keyframes bDash{0%,100%{transform:translateX(0)}50%{transform:translateX(40px) scale(1.15)}}
+@keyframes superFlashAnim{0%{opacity:1;background:#fff;}20%{background:#f59e0b;}100%{opacity:0;background:transparent;}}
 
-  <style>
-    body {
-      font-family: 'Rubik', sans-serif;
-      background-color: #1a1a2e;
-      color: #e2e8f0;
-      min-height: 100vh;
-    }
-    .app-container { direction: rtl; }
-    .game-card {
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-      border: 2px solid rgba(255, 255, 255, 0.1);
-    }
-    .game-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-      border-color: #a855f7;
-    }
-    .selected {
-      border-color: #f472b6;
-      box-shadow: 0 0 15px rgba(244, 114, 182, 0.6);
-      transform: scale(1.02);
-      background-color: rgba(244, 114, 182, 0.1);
-    }
-    .correct-match {
-      background-color: #065f46 !important;
-      border-color: #34d399 !important;
-      color: #ecfdf5 !important;
-      animation: pulse-green 0.5s;
-    }
-    .incorrect-match {
-      background-color: #7f1d1d !important;
-      border-color: #f87171 !important;
-      color: #fef2f2 !important;
-      animation: shake 0.4s;
-    }
-    @keyframes pulse-green {
-      0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-    .stage-locked { opacity: 0.5; filter: grayscale(100%); pointer-events: none; }
-    
-    /* Flip Card Styles */
-    .transform-style-3d { transform-style: preserve-3d; } 
-    .backface-hidden { backface-visibility: hidden; } 
-    .rotate-y-180 { transform: rotateY(180deg); }
+.screen{min-height:100vh;display:flex;flex-direction:column;animation:fadeUp .35s ease both;}
+.shake-s{animation:screenShake .35s ease!important;}
+.shake-h{animation:screenShake .55s ease!important;}
+.anim-pop{animation:pop .3s ease;}
+.anim-shake{animation:shake .4s ease;}
+.pDash{animation:pDash .3s ease forwards;}
+.bDash{animation:bDash .3s ease forwards;}
+.super-flash{position:fixed;inset:0;background:#fff;z-index:9999;animation:superFlashAnim 1s ease-out forwards;pointer-events:none;}
 
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #1f2937; }
-    ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-  </style>
+/* ── BUTTONS ─────────────────────── */
+.btn{border:none;cursor:pointer;border-radius:50px;font-family:'Heebo',sans-serif;font-weight:800;transition:all .18s;display:inline-flex;align-items:center;justify-content:center;gap:6px;-webkit-tap-highlight-color:transparent;}
+.btn:active{transform:scale(.94)!important;}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:14px 32px;font-size:1.05rem;box-shadow:0 4px 20px rgba(99,102,241,.5);}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:13px 28px;font-size:1rem;box-shadow:0 4px 16px rgba(239,68,68,.4);}
+.btn-ghost{background:rgba(255,255,255,.08);color:#fff;padding:12px 24px;font-size:.95rem;border:1.5px solid rgba(255,255,255,.2);}
+.btn-back{width:40px;height:40px;border:none;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:transform .15s;flex-shrink:0;background:rgba(255,255,255,.1);color:#fff;}
+.btn-back:hover{transform:scale(1.1);}
+
+/* ── HUD ─────────────────────────── */
+.hud{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;z-index:50;}
+.heart{font-size:1.25rem;transition:all .3s;line-height:1;}
+.heart.lost{opacity:.2;filter:grayscale(1);transform:scale(.8);}
+.gems-hud{background:rgba(255,255,255,.08);border-radius:50px;padding:5px 12px;font-weight:900;font-size:.9rem;display:flex;align-items:center;gap:4px;}
+
+/* ── COMBO ───────────────────────── */
+.combo-badge{padding:4px 12px;border-radius:50px;font-weight:900;font-size:.82rem;white-space:nowrap;}
+.combo-2{background:linear-gradient(135deg,#f59e0b,#f97316);box-shadow:0 0 12px rgba(245,158,11,.5);}
+.combo-5{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 0 20px rgba(239,68,68,.7);animation:powerGlow .6s ease infinite;}
+.combo-10{background:linear-gradient(135deg,#8b5cf6,#ec4899,#f59e0b);box-shadow:0 0 30px rgba(139,92,246,.8);animation:rainbow 1.2s linear infinite;}
+
+/* ── POWER BAR ───────────────────── */
+.power-bar-wrap{padding:8px 16px;display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.3);}
+.power-segments{display:flex;gap:4px;flex:1;}
+.power-seg{flex:1;height:10px;border-radius:5px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);transition:all .3s;}
+.power-seg.lit{background:linear-gradient(90deg,#f59e0b,#ef4444);box-shadow:0 0 8px rgba(245,158,11,.6);}
+.super-btn{padding:8px 16px;border-radius:14px;border:2px solid rgba(245,158,11,.7);background:rgba(245,158,11,.15);font-family:'Heebo',sans-serif;font-weight:900;font-size:.82rem;cursor:pointer;color:#f59e0b;transition:all .2s;white-space:nowrap;}
+.super-btn.ready{animation:superReady 1s ease infinite;border-color:#f59e0b;background:rgba(245,158,11,.25);box-shadow:0 0 20px rgba(245,158,11,.4);}
+.super-btn:disabled{opacity:.3;cursor:default;animation:none;}
+
+/* ── POTION BAR ──────────────────── */
+.potion-bar{display:flex;gap:8px;padding:6px 14px;background:rgba(0,0,0,.25);}
+.pot-btn{flex:1;padding:7px 6px;border-radius:12px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Heebo',sans-serif;font-weight:800;font-size:.75rem;color:#fff;text-align:center;transition:all .15s;}
+.pot-btn:hover:not(:disabled){border-color:#a78bfa;background:rgba(167,139,250,.15);}
+.pot-btn:disabled{opacity:.3;cursor:default;}
+
+/* ── QUESTION CARD ───────────────── */
+.q-card{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:26px;padding:24px;text-align:center;margin:10px 14px;transition:all 0.3s ease;}
+.q-card.golden{border-width:3px;border-color:#f59e0b;background:rgba(245,158,11,.15);animation:goldPulse 1.5s ease infinite;transform:scale(1.02);}
+.q-emoji{font-size:3rem;margin-bottom:8px;}
+.q-he{font-weight:900;font-size:1.65rem;line-height:1.2;}
+.gold-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#78350f;border-radius:50px;padding:5px 14px;font-size:.85rem;font-weight:900;margin-top:10px;box-shadow:0 0 20px rgba(245,158,11,0.6);animation:pop 0.5s ease;}
+
+/* ── OPTIONS ─────────────────────── */
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 10px;}
+.opt{padding:14px 10px;border-radius:18px;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);cursor:pointer;font-family:'Heebo',sans-serif;font-weight:800;font-size:.95rem;text-align:center;transition:all .18s;color:#fff;direction:ltr;}
+.opt:hover:not(:disabled){border-color:#a78bfa;background:rgba(167,139,250,.18);transform:scale(1.04);}
+.opt.correct{border-color:#10b981!important;background:rgba(16,185,129,.28)!important;animation:pop .3s ease;}
+.opt.wrong{border-color:#ef4444!important;background:rgba(239,68,68,.25)!important;animation:shake .4s ease;}
+.opt:disabled{cursor:default;}
+
+/* ── MATCH ───────────────────────── */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;}
+.mc{padding:12px 8px;border-radius:16px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);cursor:pointer;font-weight:800;text-align:center;min-height:62px;display:flex;align-items:center;justify-content:center;font-size:.86rem;line-height:1.3;transition:all .18s;color:#fff;}
+.mc:hover:not(.dis){border-color:#a78bfa;transform:scale(1.04);}
+.mc.sel{border-color:#6366f1;background:rgba(99,102,241,.28);box-shadow:0 0 0 3px rgba(99,102,241,.3);transform:scale(1.06);}
+.mc.ok{border-color:#10b981;background:rgba(16,185,129,.2);cursor:default;animation:pop .3s ease;}
+.mc.err{border-color:#ef4444;background:rgba(239,68,68,.2);animation:shake .4s ease;}
+.mc.dis{opacity:.18;cursor:default;pointer-events:none;}
+
+/* ── BOSS ARENA ──────────────────── */
+.arena{padding:24px 14px 16px;position:relative;}
+.arena-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:10px;position:relative;padding-bottom:18px;border-bottom:2px solid rgba(255,255,255,.08);background:linear-gradient(to top,rgba(255,255,255,.04) 0%,transparent 60%);border-radius:0 0 100px 100px;}
+.fighter-box{flex:1;text-align:center;z-index:2;}
+.fighter-emoji{font-size:3.5rem;display:inline-block;transition:all .3s;}
+.fighter-emoji.hit{animation:hitFlash .35s ease;}
+.fighter-emoji.angry{animation:bossAngry 1s ease infinite;}
+.fighter-emoji.enraged{animation:bossEnrage .6s ease infinite;filter:drop-shadow(0 0 20px #ef4444);}
+.fighter-emoji.dead{animation:bossDeath .9s ease forwards;}
+.hp-label{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:4px;}
+.hp-bar{height:10px;border-radius:8px;overflow:hidden;margin-bottom:4px;}
+.hp-fill{height:100%;border-radius:8px;transition:width .5s cubic-bezier(.34,1.56,.64,1);}
+.vs-divider{font-family:'Fredoka One',cursive;font-size:1.1rem;color:rgba(255,255,255,.4);padding:0 4px;flex-shrink:0;padding-bottom:20px;z-index:1;}
+.boss-dialogue{background:rgba(0,0,0,.5);border:1px solid rgba(239,68,68,.4);border-radius:14px;padding:10px 14px;font-size:.85rem;font-weight:700;font-style:italic;color:rgba(255,255,255,.9);text-align:center;min-height:36px;transition:all .3s;box-shadow:0 6px 20px rgba(0,0,0,.4);}
+.phase-badge{display:inline-flex;align-items:center;gap:4px;border-radius:50px;padding:3px 10px;font-size:.7rem;font-weight:900;margin-bottom:4px;}
+.phase-normal{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);}
+.phase-angry{background:rgba(245,158,11,.2);color:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,.4);}
+.phase-enraged{background:rgba(239,68,68,.2);color:#ef4444;box-shadow:0 0 14px rgba(239,68,68,.5);animation:pulseRed 1s ease infinite;}
+.special-warning{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;animation:specialWarning .5s ease infinite;pointer-events:none;}
+.enrage-tint{position:fixed;inset:0;background:rgba(239,68,68,.06);z-index:1;pointer-events:none;animation:pulseRed 1.5s ease infinite;}
+
+/* ── TIMER RING ──────────────────── */
+.timer-ring-wrap{display:flex;align-items:center;justify-content:center;margin:2px 0 6px;}
+.timer-ring{width:54px;height:54px;position:relative;display:inline-flex;align-items:center;justify-content:center;}
+.timer-ring svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.timer-num{font-family:'Fredoka One',cursive;font-size:1.2rem;position:relative;z-index:1;}
+
+/* ── PROGRESS BARS ───────────────── */
+.pbar{height:8px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden;}
+.pfill{height:100%;border-radius:10px;transition:width .6s cubic-bezier(.34,1.56,.64,1);}
+.xp-bar{height:5px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:10px;transition:width .5s ease;}
+
+/* ── CARDS & SECTIONS ────────────── */
+.world-card{border-radius:28px;padding:20px;cursor:pointer;transition:all .25s;margin-bottom:14px;position:relative;overflow:hidden;}
+.world-card:hover:not(.locked){transform:translateY(-4px);}
+.world-card.locked{opacity:.4;filter:grayscale(.8);cursor:not-allowed;}
+.char-card{background:rgba(255,255,255,.06);border:2px solid transparent;border-radius:24px;padding:18px;cursor:pointer;transition:all .2s;}
+.char-card:hover{transform:translateY(-4px);border-color:var(--c);}
+.char-card.picked{border-color:var(--c);background:rgba(255,255,255,.12);box-shadow:0 0 28px var(--cg);}
+
+/* ── RESULT CARD ─────────────────── */
+.result-card{background:rgba(255,255,255,.96);color:#1e293b;border-radius:32px;padding:32px 24px;margin:20px 14px;box-shadow:0 24px 64px rgba(0,0,0,.5);}
+
+/* ── STREAK ──────────────────────── */
+.streak-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#ff6b6b,#f59e0b);border-radius:50px;padding:5px 14px;font-weight:900;font-size:.88rem;}
+.streak-fire{animation:streakFire .8s ease infinite;}
+
+/* ── CHEST ───────────────────────── */
+.chest-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;text-align:center;}
+.chest-emoji{font-size:6.5rem;cursor:pointer;animation:chestBounce 1.5s ease infinite;filter:drop-shadow(0 10px 20px rgba(0,0,0,0.5));}
+.chest-emoji.open{animation:pop .4s ease;cursor:default;}
+.card-reveal{animation:cardReveal .5s cubic-bezier(.34,1.56,.64,1) both;}
+
+/* ── SHOP ────────────────────────── */
+.shop-item{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:22px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;transition:all .2s;}
+.shop-item:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1);}
+
+/* ── ACHIEVEMENT POPUP ───────────── */
+#ach-popup{position:fixed;top:0;left:50%;transform:translate(-50%,-120%);z-index:9999;background:linear-gradient(135deg,#1e293b,#0f172a);border:2px solid #f59e0b;border-radius:20px;padding:12px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 40px rgba(245,158,11,.5);max-width:340px;width:92%;transition:transform .45s cubic-bezier(.34,1.56,.64,1);}
+#ach-popup.show{transform:translate(-50%,10px);}
+
+/* ── MOBILE ──────────────────────── */
+@media(max-width:360px){.q-he{font-size:1.45rem;}.opt{font-size:.85rem;}.fighter-emoji{font-size:2.8rem;}.q-emoji{font-size:2.4rem;}}
+</style>
 </head>
+<body>
+<div class="app-root" id="app-root">
+  <div id="app"></div>
+</div>
+<div id="ach-popup">
+  <span id="ach-icon" style="font-size:2rem;"></span>
+  <div><div id="ach-title" class="ff" style="color:#f59e0b;font-size:1rem;"></div>
+  <div id="ach-desc" style="font-size:.75rem;color:rgba(255,255,255,.65);font-weight:700;"></div></div>
+</div>
 
-<body class="p-4 flex flex-col items-center">
-  <div id="app-container" class="app-container w-full max-w-4xl bg-gray-900 p-6 md:p-8 rounded-2xl shadow-2xl mt-4 border border-gray-700">
+<script>
+/* ═══════════════════════════════════════
+   DATA
+═══════════════════════════════════════ */
+const VOCAB=[
+  {s:1,en:"How many ...?", he:"... כמה",      e:"🔢"},
+  {s:1,en:"elephant",      he:"פיל",            e:"🐘"},
+  {s:1,en:"lion",          he:"אריה",           e:"🦁"},
+  {s:1,en:"turtle",        he:"צב",             e:"🐢"},
+  {s:1,en:"animal",        he:"בעל חיים",       e:"🐾"},
+  {s:1,en:"behind",        he:"מאחורי",         e:"👣"},
+  {s:1,en:"cool",          he:"מגניב",          e:"😎"},
+  {s:1,en:"face",          he:"פנים",           e:"😊"},
+  {s:1,en:"scared",        he:"פוחד",          e:"😱"},
+  {s:1,en:"this",          he:"זה, זאת",        e:"👆"},
+  {s:1,en:"walk",          he:"ללכת ברגל",      e:"🚶"},
+  {s:1,en:"water",         he:"מים",            e:"💧"},
+  {s:2,en:"What time is it?",  he:"מה השעה?",       e:"🕐"},
+  {s:2,en:"It's ... o'clock.", he:"השעה ...",        e:"🕑"},
+  {s:2,en:"It's half past ....",he:"השעה ... וחצי",   e:"🕧"},
+  {s:2,en:"dinner",            he:"ארוחת ערב",       e:"🍽️"},
+  {s:2,en:"wake up",           he:"להתעורר",         e:"☀️"},
+  {s:2,en:"bath",              he:"אמבטיה",          e:"🛁"},
+  {s:2,en:"dirty",             he:"מלוכלך",         e:"🤢"},
+  {s:2,en:"drink",             he:"לשתות",           e:"🥤"},
+  {s:2,en:"hungry",            he:"רעב",            e:"😋"},
+  {s:2,en:"listen",            he:"להאזין",          e:"👂"},
+  {s:2,en:"thirsty",           he:"צמא",            e:"🌵"},
+  {s:2,en:"tired",             he:"עייף",           e:"😴"},
+  {s:2,en:"with",              he:"עם",              e:"🤝"},
+  {s:3,en:"What are you good at?",he:"במה אתה טוב / במה את טובה?",e:"🤔"},
+  {s:3,en:"I'm good at ...",      he:"אני טוב/ה ב",      e:"💪"},
+  {s:3,en:"Arabic",               he:"ערבית",                 e:"📖"},
+  {s:3,en:"Hebrew",               he:"עברית",                 e:"📚"},
+  {s:3,en:"tricks",               he:"פעלולים",               e:"🎪"},
+  {s:3,en:"penguin",              he:"פינגווין",              e:"🐧"},
+  {s:3,en:"people",               he:"אנשים",                 e:"👥"},
+  {s:3,en:"smile",                he:"לחייך",                 e:"😄"},
+  {s:3,en:"try",                  he:"לנסות",                 e:"🎯"},
+  {s:3,en:"watch",                he:"לִצְפות",                 e:"👀"},
+  {s:4,en:"Please tell me ..",    he:"בבקשה תגיד/י לי",  e:"🗣️"},
+  {s:4,en:"birthday",             he:"יום הולדת",             e:"🎂"},
+  {s:4,en:"bring",                he:"להביא",                 e:"🎁"},
+  {s:4,en:"party",                he:"מסיבה",                 e:"🎉"},
+  {s:4,en:"beach",                he:"חוף ים",                e:"🏖️"},
+  {s:4,en:"cake",                 he:"עוגה",                 e:"🍰"},
+  {s:4,en:"farm",                 he:"חווה",                 e:"🚜"},
+  {s:4,en:"horse",                he:"סוס",                 e:"🐴"},
+  {s:4,en:"ride",                 he:"לנסוע, לרכוב",         e:"🚴"},
+  {s:4,en:"sea",                  he:"ים",                 e:"🌊"},
+  {s:4,en:"swimsuit",             he:"בגד ים",               e:"👙"},
+  {s:4,en:"when",                 he:"מתי",                 e:"📅"},
+  {s:5,en:"I know.",              he:"אני יודע/ת.",           e:"🧠"},
+  {s:5,en:"I don't know.",        he:"אני לא יודע/ת.",         e:"🤷"},
+  {s:5,en:"Good idea.",           he:"רעיון טוב",            e:"💡"},
+  {s:5,en:"kitten",               he:"חתלתול",               e:"🐱"},
+  {s:5,en:"bike",                 he:"אופניים",               e:"🚲"},
+  {s:5,en:"clean",                he:"לנקות",                 e:"🧹"},
+  {s:5,en:"dance",                he:"לרקוד",                 e:"💃"},
+  {s:5,en:"doctor",               he:"רופא/ה",                e:"👨‍⚕️"},
+  {s:5,en:"floor",                he:"ריצפה",                 e:"🏠"},
+  {s:5,en:"hospital",             he:"בית חולים",             e:"🏥"},
+  {s:5,en:"table",                he:"שולחן",                 e:"🪑"},
+  {s:5,en:"take",                 he:"לקחת",                 e:"✋"},
+];
 
-    <!-- Header -->
-    <header class="text-center mb-8">
-      <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-2 drop-shadow-lg">
-        ⚔️ ציידות השדים של ה-K-Pop
-      </h1>
-      <p id="app-subtitle" class="text-gray-400 text-lg">
-        השתמשי באנגלית כדי לגרש רוחות, לפרוץ חותמות, ולהציל את האיידולים.
-      </p>
-    </header>
+const WORLDS=[
+  {id:1,title:"ממלכת החיות",emoji:"🦁",c:"#ff6b6b",cg:"rgba(255,107,107,.5)",
+   bossName:"אריה הנשמות",bossE:"🦁",bossHp:6,
+   taunts:{normal:["האם אתה מוכן?! 😈","לא תנצחו!","אני לאריה!"],
+           angry:["זה בלתי אפשרי!!! 😤","כאב... קצת...","אל תחשוב/י שניצחת!"],
+           enraged:["💀 עכשיו אני SERIOUS!","GRRR!!!","ZE LO YITACHEN!!!"]},
+   special:"shuffle",
+   levels:[
+    {id:"1_1",title:"שערי הג'ונגל",type:"match",icon:"🔗",story:"חיות מסתתרות! חבר/י זוגות לחשוף אותן."},
+    {id:"1_2",title:"שיעור הג'ונגל",type:"quiz", icon:"🧠",story:"מלכת הג'ונגל בודקת אותך!"},
+    {id:"1_3",title:"מרוץ הנמרים", type:"speed",icon:"⚡",story:"45 שניות! תן/י הכל!"},
+    {id:"1_boss",title:"אריה הנשמות",type:"boss", icon:"👹",story:"הבוס מחכה! הכריעי אותו!"},
+   ]},
+  {id:2,title:"מגדל הזמן",emoji:"⏰",c:"#4ecdc4",cg:"rgba(78,205,196,.5)",
+   bossName:"שד השעות",bossE:"⏰",bossHp:7,
+   taunts:{normal:["הזמן עובד בשבילי!","מהר מהר! 😈","לעולם לא תנצחי!"],
+           angry:["הזמן... נגמר לי...","לא... לא!","עדיין יש לי כוח!"],
+           enraged:["⚡ TURBO MODE!!!","01:00:00 !!! ⏱️","חסר לך זמן לי לא!"]},
+   special:"timer_boost",
+   levels:[
+    {id:"2_1",title:"שעוני היום",  type:"match",icon:"🔗",story:"חבר/י מילות זמן!"},
+    {id:"2_2",title:"חדר השגרה",   type:"quiz", icon:"🧠",story:"שאלות על שגרת יום!"},
+    {id:"2_3",title:"ספרינט הזמן", type:"speed",icon:"⚡",story:"45 שניות!"},
+    {id:"2_boss",title:"שד השעות", type:"boss", icon:"👹",story:"שד השעות מחכה!"},
+   ]},
+  {id:3,title:"אקדמיית הכישרונות",emoji:"⭐",c:"#f7b731",cg:"rgba(247,183,49,.5)",
+   bossName:"הקוסם הרע",bossE:"🧙",bossHp:7,
+   taunts:{normal:["הכישרונות שלי!","לא תנצחי אותי!","הקסמים שלי חזקים!"],
+           angry:["בלתי אפשרי...","הכישרונות חוזרים...","עדיין יש לי כוח!"],
+           enraged:["💥 DARK SPELL!!!","אבדו הכוחות שלי!!!","לא ייתכן!!! 😱"]},
+   special:"hide_options",
+   levels:[
+    {id:"3_1",title:"כיתת הכישרונות",type:"match",icon:"🔗",story:"חבר/י כישרונות!"},
+    {id:"3_2",title:"מבחן הכישורים", type:"quiz", icon:"🧠",story:"הקוסם בודק אותך!"},
+    {id:"3_3",title:"תחרות המהירות", type:"speed",icon:"⚡",story:"מהירות = עוצמה!"},
+    {id:"3_boss",title:"הקוסם הרע",  type:"boss", icon:"👹",story:"בטל/י קללות בתשובות נכונות!"},
+   ]},
+  {id:4,title:"ממלכת המסיבות",emoji:"🎂",c:"#a55eea",cg:"rgba(165,94,234,.5)",
+   bossName:"שד המסיבה",bossE:"😈",bossHp:8,
+   taunts:{normal:["המסיבה שלי!!!","לא תיכנסי!","אין לך הזמנה! 😈"],
+           angry:["מה?! זה לא יתכן!","המסיבה... נגמרת...","עדיין לא!"],
+           enraged:["💀 PARTY OVER!!!","הכל שחור!!! 😭","NOOOO!!!"]},
+   special:"shuffle",
+   levels:[
+    {id:"4_1",title:"גן החגיגות",    type:"match",icon:"🔗",story:"חבר/י מילות חגיגה!"},
+    {id:"4_2",title:"הזמנה למסיבה",  type:"quiz", icon:"🧠",story:"שאלות על מסיבות!"},
+    {id:"4_3",title:"ריצת יום הולדת",type:"speed",icon:"⚡",story:"הנרות בוערים! מהר!"},
+    {id:"4_boss",title:"שד המסיבה",  type:"boss", icon:"👹",story:"הכריעי את שד המסיבה!"},
+   ]},
+  {id:5,title:"מגדל הידע",emoji:"💡",c:"#26de81",cg:"rgba(38,222,129,.5)",
+   bossName:"הבוס הסופי",bossE:"👾",bossHp:10,
+   taunts:{normal:["הקרב הסופי!!! 💀","אתה/את לא מוכן/ה!","חיי כל חייך לזה!"],
+           angry:["לא... לא יתכן!","הכוח שלי אוזל...","עדיין... לא..."],
+           enraged:["☠️ FINAL FORM!!!","FULL POWER!!!","THIS IS IMPOSSIBLE!"]},
+   special:"timer_boost",
+   levels:[
+    {id:"5_1",title:"מעבדת הידע",    type:"match",icon:"🔗",story:"חבר/י חפצים ומשפטים!"},
+    {id:"5_2",title:"מבחן הידע",     type:"quiz", icon:"🧠",story:"הסופי. הכי חשוב!"},
+    {id:"5_3",title:"ספרינט הידע",   type:"speed",icon:"⚡",story:"הכוח האחרון שלך!"},
+    {id:"5_boss",title:"הבוס הסופי", type:"boss", icon:"💀",story:"הכל הוביל לרגע הזה!!!"},
+   ]},
+];
 
-    <!-- Status Bar -->
-    <div id="status-bar" class="grid grid-cols-3 gap-3 mb-4 bg-gray-800 p-4 rounded-xl border border-gray-700">
-      <div class="flex flex-col">
-        <span class="text-xs text-gray-500 uppercase tracking-wider">ניקוד נשמות</span>
-        <span id="current-score" class="text-2xl font-bold text-pink-500">0</span>
+const CHARS=[
+  {id:"leila",name:"לילה",role:"הגיבורה",e:"⚔️",
+   av:"https://api.dicebear.com/7.x/adventurer/svg?seed=Leila&backgroundColor=ff6b6b80",
+   c:"#ff6b6b",cg:"rgba(255,107,107,.4)",
+   ability:"extra_heart",aName:"לב נוסף",aDesc:"4 לבבות במקום 3 בכל שלב"},
+  {id:"maya",name:"מאיה",role:"המרפאה",e:"💚",
+   av:"https://api.dicebear.com/7.x/adventurer/svg?seed=Maya&backgroundColor=4ecdc480",
+   c:"#4ecdc4",cg:"rgba(78,205,196,.4)",
+   ability:"heal_boss",aName:"ריפוי קרב",aDesc:"מקבלת ❤️ חזרה אחרי ניצחון בוס"},
+  {id:"shira",name:"שירה",role:"הקוסמת",e:"✨",
+   av:"https://api.dicebear.com/7.x/adventurer/svg?seed=Shira&backgroundColor=f7b73180",
+   c:"#f7b731",cg:"rgba(247,183,49,.4)",
+   ability:"double_gems",aName:"יהלומים x2",aDesc:"מרוויחה יהלומים כפולים מכל תשובה"},
+  {id:"dana",name:"דנה",role:"המהירה",e:"⚡",
+   av:"https://api.dicebear.com/7.x/adventurer/svg?seed=Dana&backgroundColor=a55eea80",
+   c:"#a55eea",cg:"rgba(165,94,234,.4)",
+   ability:"speed_bonus",aName:"זמן נוסף",aDesc:"3 שניות נוספות בשלבי מהירות"},
+];
+
+const ACHIEV=[
+  {id:"first_level",  e:"🌟",t:"ראשונה!",         d:"השלמת את השלב הראשון"},
+  {id:"perfect",      e:"💎",t:"מושלמת!",          d:"חידון ללא אף טעות"},
+  {id:"combo5",       e:"🔥",t:"בוערת!",           d:"5 תשובות ברצף"},
+  {id:"combo10",      e:"🌊",t:"גל של כוח!",        d:"10 תשובות ברצף"},
+  {id:"combo20",      e:"⚡",t:"GODLIKE!",         d:"20 תשובות ברצף!!!"},
+  {id:"golden5",      e:"✨",t:"מזל זהב!",         d:"5 מילות זהב הושגו"},
+  {id:"speed10",      e:"🚀",t:"רוקט!",            d:"10+ נכון במצב מהירות"},
+  {id:"first_boss",   e:"👑",t:"בוס בסטר!",         d:"הביסי בוס ראשון!"},
+  {id:"all_bosses",   e:"🏆",t:"גיבורת הג'ט!!!",    d:"כל 5 הבוסים הובסו!"},
+  {id:"gems500",      e:"💰",t:"עשירה!",           d:"500 יהלומים"},
+  {id:"super3",       e:"⚡",t:"סופרגיבורה!",        d:"השתמשת ב-SUPER 3 פעמים"},
+  {id:"all_stars",    e:"⭐",t:"כוכבת!",            d:"3 כוכבים בכל שלב"},
+];
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+const SK="eq_v10_spectacle";
+function defST(){return{charId:null,gems:50,xp:0,lvl:1,xpNext:100,hp:100,maxHp:100,
+  potions:{hint:1,shield:0},levels:{},mastery:{},achievements:{},
+  totalCorrect:0,comboRecord:0,superUsed:0,goldenHits:0,
+  streak:0,lastDate:null};}
+let ST=defST();
+
+function loadST(){try{const r=localStorage.getItem(SK);if(r){const p=JSON.parse(r);ST={...defST(),...p,potions:{...defST().potions,...(p.potions||{})},achievements:{...p.achievements}};}}catch(e){}}
+function saveST(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
+function getLD(id){return ST.levels[id]||{stars:0,done:false};}
+function wDone(wId){return WORLDS.find(x=>x.id===wId).levels.every(l=>getLD(l.id).done);}
+function wUnlocked(wId){return wId===1||wDone(wId-1);}
+function lUnlocked(wId,lId){const w=WORLDS.find(x=>x.id===wId),i=w.levels.findIndex(l=>l.id===lId);return i===0?wUnlocked(wId):getLD(w.levels[i-1].id).done;}
+function totalStars(){return Object.values(ST.levels).reduce((s,l)=>s+l.stars,0);}
+function getChar(){return CHARS.find(c=>c.id===ST.charId)||CHARS[0];}
+function updateStreak(){const today=new Date().toDateString();if(ST.lastDate===today)return;const yesterday=new Date(Date.now()-86400000).toDateString();ST.streak=ST.lastDate===yesterday?ST.streak+1:1;ST.lastDate=today;saveST();}
+
+/* ═══════════════════════════════════════
+   UTILS & ANIMATIONS
+═══════════════════════════════════════ */
+function shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function randDist(en,n){return shuf(VOCAB.filter(v=>v.en!==en).map(v=>v.en)).slice(0,n);}
+
+function shake(heavy=false){const r=document.getElementById('app-root');r.classList.remove('shake-s','shake-h');void r.offsetWidth;r.classList.add(heavy?'shake-h':'shake-s');}
+function hitFighter(id){const e=document.getElementById(id);if(e){e.classList.add('hit');setTimeout(()=>e.classList.remove('hit'),380);}}
+
+function dmgNum(txt,good=true,x,y){
+  const d=document.createElement('div');
+  d.textContent=txt;
+  d.style.cssText=`position:fixed;left:${x||50}%;top:${y||40}%;transform:translateX(-50%);z-index:999;font-family:'Fredoka One',cursive;font-size:${txt.length>4?'1.8rem':'2.2rem'};color:${good?'#10b981':'#ef4444'};pointer-events:none;animation:dmgNum .9s ease forwards;text-shadow:0 3px 12px rgba(0,0,0,.7);`;
+  document.body.appendChild(d);setTimeout(()=>d.remove(),950);
+}
+
+function shootProjectile(fromId, toId, emoji, isSuper=false) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  if(!from || !to) return;
+  const fRect = from.getBoundingClientRect();
+  const tRect = to.getBoundingClientRect();
+  
+  const p = document.createElement('div');
+  p.textContent = emoji;
+  p.style.cssText = `position:fixed;left:${fRect.left+fRect.width/2}px;top:${fRect.top+fRect.height/2}px;font-size:${isSuper?'5rem':'2.5rem'};z-index:999;pointer-events:none;transition:all 0.3s cubic-bezier(0.5,0,0.8,1);transform:translate(-50%,-50%);filter:drop-shadow(0 0 15px ${isSuper?'#f59e0b':'rgba(255,255,255,0.8)'});`;
+  document.body.appendChild(p);
+  
+  setTimeout(()=>{
+     const dx = (tRect.left+tRect.width/2) - (fRect.left+fRect.width/2);
+     const dy = (tRect.top+tRect.height/2) - (fRect.top+fRect.height/2);
+     p.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(${isSuper?2:1.5})`;
+  }, 20);
+  
+  setTimeout(()=>{
+     p.remove();
+     hitFighter(toId);
+  }, 320);
+}
+
+function flyGems(n){
+  const hud=document.getElementById('hud-gems-wrap');if(!hud)return;
+  const r=hud.getBoundingClientRect();
+  for(let i=0;i<Math.min(n,5);i++){
+    const d=document.createElement('div');d.textContent='💎';
+    const sx=window.innerWidth/2+(Math.random()-0.5)*100;
+    const sy=window.innerHeight*0.45+(Math.random()-0.5)*80;
+    d.style.cssText=`position:fixed;left:${sx}px;top:${sy}px;z-index:998;font-size:1.1rem;pointer-events:none;`;
+    document.body.appendChild(d);
+    const gx=r.left+r.width/2-sx,gy=r.top+r.height/2-sy;
+    d.style.setProperty('--gx',gx+'px');d.style.setProperty('--gy',gy+'px');
+    setTimeout(()=>{d.style.cssText+=`animation:gemFly .7s ease ${i*.08}s forwards;`;},50);
+    setTimeout(()=>d.remove(),900+i*80);
+  }
+}
+
+function showComboFlash(n){
+  if(n!==5&&n!==10&&n!==20)return;
+  const d=document.createElement('div');
+  d.style.cssText=`position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;pointer-events:none;`;
+  const msg=n>=20?'⚡ GODLIKE! ⚡':n>=10?'🌊 MEGA COMBO! 🌊':'🔥 COMBO x5! 🔥';
+  const col=n>=20?'linear-gradient(135deg,#8b5cf6,#ec4899,#f59e0b)':n>=10?'linear-gradient(135deg,#06b6d4,#3b82f6)':'linear-gradient(135deg,#f59e0b,#ef4444)';
+  d.innerHTML=`<div class="ff" style="font-size:${n>=20?'2.2rem':'1.8rem'};background:${col};-webkit-background-clip:text;-webkit-text-fill-color:transparent;padding:16px 28px;border-radius:20px;background-color:#000;animation:comboFlash .8s ease;text-align:center;line-height:1.2;">${msg}</div>`;
+  document.body.appendChild(d);
+  if(n>=10)shake(n>=20);
+  setTimeout(()=>d.remove(),900);
+}
+
+let _achHide=null;
+function showAchievement(id){
+  const a=ACHIEV.find(x=>x.id===id);if(!a)return;
+  const p=document.getElementById('ach-popup');
+  document.getElementById('ach-icon').textContent=a.e;
+  document.getElementById('ach-title').textContent='🏅 הישג חדש: '+a.t;
+  document.getElementById('ach-desc').textContent=a.d;
+  p.classList.add('show');if(_achHide)clearTimeout(_achHide);
+  _achHide=setTimeout(()=>p.classList.remove('show'),3500);
+}
+function grantAch(id){if(ST.achievements[id])return;ST.achievements[id]=true;saveST();setTimeout(()=>showAchievement(id),500);}
+function checkAch(){
+  const done=Object.values(ST.levels).filter(l=>l.done).length;
+  if(done>=1)grantAch('first_level');
+  if(ST.gems>=500)grantAch('gems500');
+  if(ST.comboRecord>=5)grantAch('combo5');
+  if(ST.comboRecord>=10)grantAch('combo10');
+  if(ST.comboRecord>=20)grantAch('combo20');
+  if(ST.goldenHits>=5)grantAch('golden5');
+  if(ST.superUsed>=3)grantAch('super3');
+  const bossWins=WORLDS.filter(w=>getLD(w.levels[3].id).done).length;
+  if(bossWins>=1)grantAch('first_boss');
+  if(bossWins>=5)grantAch('all_bosses');
+  if(WORLDS.every(w=>w.levels.every(l=>getLD(l.id).stars===3)))grantAch('all_stars');
+}
+
+function toast(msg,dur=2000){
+  let t=document.getElementById('g-toast');
+  if(!t){t=document.createElement('div');t.id='g-toast';t.style.cssText='position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:9990;background:rgba(15,23,42,.95);border:1px solid rgba(255,255,255,.2);color:#fff;padding:10px 20px;border-radius:50px;font-family:Heebo,sans-serif;font-weight:800;font-size:.88rem;pointer-events:none;opacity:0;transition:opacity .25s;white-space:nowrap;max-width:90%;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.5);';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>{t.style.opacity='0';},dur);
+}
+
+function addXP(n){ST.xp+=n;while(ST.xp>=ST.xpNext){ST.xp-=ST.xpNext;ST.lvl++;ST.xpNext=Math.round(ST.xpNext*1.3);ST.maxHp=Math.min(160,ST.maxHp+5);ST.hp=ST.maxHp;toast(`⭐ עלית לרמה ${ST.lvl}! HP מקסימלי עלה!`,2800);}saveST();}
+function addGems(n){const m=ST.charId==='shira'?2:1;ST.gems+=n*m;saveST();updateHUD();}
+
+function updateHUD(){const el=document.getElementById('hud-gems');if(el)el.textContent=ST.gems;}
+
+/* ═══════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════ */
+let _spTick=null,_bsTick=null,_shuffleTick=null;
+function clearTimers(){[_spTick,_bsTick,_shuffleTick].forEach(t=>{if(t){clearInterval(t);}});_spTick=_bsTick=_shuffleTick=null;}
+
+function go(screen,...args){
+  clearTimers();window.scrollTo(0,0);
+  const app=document.getElementById('app');
+  if(screen==='chars')app.innerHTML=renderChars();
+  else if(screen==='map'){updateStreak();app.innerHTML=renderMap();}
+  else if(screen==='world')app.innerHTML=renderWorld(args[0]);
+  else if(screen==='shop')app.innerHTML=renderShop();
+  else if(screen==='profile')app.innerHTML=renderProfile();
+}
+function startLevel(wId,lId){clearTimers();window.scrollTo(0,0);initGame(wId,lId);}
+
+/* ═══════════════════════════════════════
+   CHAR SELECT
+═══════════════════════════════════════ */
+function renderChars(){
+  const pick=ST.charId;
+  return `<div class="screen" style="background:radial-gradient(ellipse at 50% 0%,#1a0a4a 0%,#08081a 60%);padding-bottom:32px;">
+    <div style="text-align:center;padding:40px 16px 28px;">
+      <div style="font-size:3.5rem;margin-bottom:10px;animation:float 2.5s ease infinite;">⚔️</div>
+      <h1 class="ff" style="font-size:2.6rem;background:linear-gradient(135deg,#6366f1,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">English Quest</h1>
+      <p style="color:rgba(255,255,255,.5);font-size:.9rem;font-weight:700;margin:6px 0 24px;">Jet 2 Unit 3 · בחרי גיבורה!</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;margin-bottom:20px;">
+      ${CHARS.map(ch=>`
+      <div class="char-card ${pick===ch.id?'picked':''}" style="--c:${ch.c};--cg:${ch.cg};" onclick="pickChar('${ch.id}')">
+        ${pick===ch.id?`<div style="position:absolute;top:8px;left:8px;background:${ch.c};border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;z-index:1;">✓</div>`:''}
+        <img src="${ch.av}" style="width:62px;height:62px;border-radius:50%;border:3px solid ${ch.c};display:block;margin-bottom:8px;background:rgba(255,255,255,.08);" onerror="this.style.fontSize='2rem';this.style.textAlign='center';this.textContent='${ch.e}';">
+        <div class="ff" style="color:${ch.c};font-size:1rem;">${ch.name}</div>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.45);font-weight:700;margin-bottom:6px;">${ch.role}</div>
+        <div style="font-size:.7rem;background:rgba(255,255,255,.07);border-radius:10px;padding:6px 8px;color:rgba(255,255,255,.7);font-weight:700;line-height:1.4;"><span style="color:${ch.c}">⚡ ${ch.aName}:</span><br>${ch.aDesc}</div>
+      </div>`).join('')}
+    </div>
+    <div style="padding:0 16px;">
+      <p style="color:rgba(255,255,255,.5);font-size:.85rem;text-align:center;">בחרי את הגיבורה שלך כדי להתחיל במסע!</p>
+    </div>
+  </div>`;
+}
+
+function pickChar(id){
+  ST.charId=id;
+  saveST();
+  confetti({particleCount:100, spread:70, origin:{y:0.6}});
+  go('map');
+}
+
+/* ═══════════════════════════════════════
+   WORLD MAP
+═══════════════════════════════════════ */
+function renderMap(){
+  const ch=getChar(),ts=totalStars(),ms=WORLDS.reduce((s,w)=>s+w.levels.length*3,0);
+  return `<div class="screen" style="background:radial-gradient(ellipse at 50% 0%,#0f0a28 0%,#08081a 70%);padding-bottom:40px;">
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(0,0,0,.55);border-bottom:1px solid rgba(255,255,255,.07);">
+      <img src="${ch.av}" style="width:40px;height:40px;border-radius:50%;border:2px solid ${ch.c};background:rgba(255,255,255,.08);flex-shrink:0;" onerror="this.style.fontSize='1.4rem';this.style.textAlign='center';this.textContent='${ch.e}';">
+      <div style="flex:1;min-width:0;">
+        <div class="ff" style="color:${ch.c};font-size:.9rem;">${ch.name} · רמה ${ST.lvl}</div>
+        <div class="xp-bar" style="width:100px;"><div class="xp-fill" style="width:${ST.xp/ST.xpNext*100}%;"></div></div>
       </div>
-      <div class="flex flex-col">
-        <span class="text-xs text-gray-500 uppercase tracking-wider">שיא ציידת</span>
-        <span id="high-score" class="text-2xl font-bold text-purple-500">...</span>
-      </div>
-      <div class="flex flex-col">
-        <span class="text-xs text-gray-500 uppercase tracking-wider">Relics</span>
-        <span id="relics-count" class="text-2xl font-bold text-emerald-400">0</span>
+      ${ST.streak>=2?`<div class="streak-badge"><span class="streak-fire">🔥</span>${ST.streak} ימים!</div>`:''}
+      <div id="hud-gems-wrap" class="gems-hud" onclick="go('shop')" style="cursor:pointer;">💎 <span id="hud-gems">${ST.gems}</span></div>
+      <button class="btn-back" style="width:34px;height:34px;font-size:.95rem;" onclick="go('profile')">🏅</button>
+    </div>
+    <div style="text-align:center;padding:16px 16px 10px;">
+      <div class="ff" style="font-size:1rem;color:rgba(255,255,255,.6);">⭐ ${ts} / ${ms} כוכבים</div>
+    </div>
+    <div style="padding:0 14px;">
+      ${WORLDS.map(w=>renderWorldCard(w)).join('')}
+    </div>
+  </div>`;
+}
+
+function renderWorldCard(w){
+  const unlocked=wUnlocked(w.id);
+  const stars=w.levels.reduce((s,l)=>s+getLD(l.id).stars,0);
+  const max=w.levels.length*3,pct=Math.round(stars/max*100);
+  return `<div class="world-card${!unlocked?' locked':''}" style="background:linear-gradient(135deg,${w.c}20,${w.c}08);border:1.5px solid ${unlocked?w.c+'50':'rgba(255,255,255,.07)'};"
+    onclick="${unlocked?`go('world',${w.id})`:"toast('השלמי את העולם הקודם תחילה!')"}" >
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:58px;height:58px;border-radius:20px;background:${w.c}18;border:2px solid ${w.c}88;display:flex;align-items:center;justify-content:center;font-size:1.9rem;flex-shrink:0;">${unlocked?w.emoji:'🔒'}</div>
+      <div style="flex:1;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+          <span class="ff" style="font-size:1.05rem;">${w.title}</span>
+          <span style="font-size:.85rem;">${[1,2,3].map(i=>i<=Math.round(pct/100*3)?'⭐':'<span style="opacity:.18">⭐</span>').join('')}</span>
+        </div>
+        <div style="color:rgba(255,255,255,.4);font-size:.74rem;font-weight:700;margin-bottom:7px;">בוס: ${w.bossName} · ${pct}%</div>
+        <div class="pbar"><div class="pfill" style="width:${pct}%;background:${w.c};"></div></div>
       </div>
     </div>
+  </div>`;
+}
 
-    <div class="text-xs text-center text-gray-600 mb-4" id="user-id-display">מצב: מתחבר למסדר הציידות...</div>
+/* ═══════════════════════════════════════
+   WORLD INTERIOR
+═══════════════════════════════════════ */
+const lTypeName={match:"🔗 חיבורים",quiz:"🧠 חידון",speed:"⚡ מהירות",boss:"👹 קרב בוס"};
+const lTypeBg={match:"#6366f1",quiz:"#10b981",speed:"#f59e0b",boss:"#ef4444"};
 
-    <!-- VIEWS Container -->
-    <div id="views-container" class="relative min-h-[420px]">
-
-      <!-- MAP VIEW -->
-      <div id="map-view" class="view">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-2xl font-bold text-gray-300 flex items-center gap-2">
-            <span class="text-2xl">🗺️</span> מפת העולמות
-          </h2>
-          <div class="flex gap-2">
-            <button onclick="AdventureGame.toggleHardMode()" class="px-4 py-2 rounded-xl bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 transition font-bold text-sm">
-              🧨 מצב קשה: <span id="hard-mode-ind">כבוי</span>
-            </button>
-            <button onclick="AdventureGame.resetLocal()" class="px-4 py-2 rounded-xl bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 transition font-bold text-sm">
-              ♻️ איפוס מקומי
-            </button>
-          </div>
-        </div>
-
-        <div id="worlds-list" class="space-y-4"></div>
+function renderWorld(wId){
+  const w=WORLDS.find(x=>x.id===wId);
+  return `<div class="screen" style="background:radial-gradient(ellipse at 50% 0%,${w.c}22 0%,#08081a 50%);min-height:100vh;padding-bottom:32px;">
+    <div style="background:linear-gradient(135deg,${w.c}30,${w.c}10);padding:20px 14px 24px;border-bottom:1px solid ${w.c}44;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <button class="btn-back" onclick="go('map')">←</button>
+        <h1 class="ff" style="font-size:1.65rem;">${w.emoji} ${w.title}</h1>
       </div>
-
-      <!-- NARRATIVE VIEW -->
-      <div id="stage-challenge-view" class="view hidden">
-        <div class="bg-gray-800 rounded-2xl overflow-hidden shadow-xl border border-gray-700">
-          <div class="relative h-48 bg-gray-900 overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
-            <img id="stage-character-img" class="w-full h-full object-cover opacity-80" alt="Demon" src="">
-            <div class="absolute bottom-4 right-4 z-20 text-right">
-              <h2 id="stage-title" class="text-3xl font-black text-white drop-shadow-md"></h2>
-              <p id="stage-meta" class="text-sm text-gray-300 mt-1"></p>
-            </div>
-          </div>
-
-          <div class="p-6 md:p-8">
-            <div class="flex items-start gap-4 mb-6">
-              <span class="text-4xl">📜</span>
-              <p id="stage-narrative" class="text-lg text-gray-300 leading-relaxed"></p>
-            </div>
-
-            <div class="bg-gray-900/50 p-4 rounded-xl border border-gray-700 mb-6">
-              <h3 class="text-pink-400 font-bold mb-2 uppercase text-sm tracking-widest">המשימה שלך</h3>
-              <p id="challenge-instructions" class="text-xl font-bold text-white"></p>
-              <p id="challenge-tip" class="text-sm text-gray-300 mt-2"></p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-              <div class="bg-gray-900/50 p-4 rounded-xl border border-gray-700">
-                <div class="text-xs text-gray-500 uppercase tracking-wider">פרס</div>
-                <div id="reward-text" class="text-lg font-bold text-emerald-300"></div>
-              </div>
-              <div class="bg-gray-900/50 p-4 rounded-xl border border-gray-700">
-                <div class="text-xs text-gray-500 uppercase tracking-wider">סיכון</div>
-                <div id="risk-text" class="text-lg font-bold text-amber-300"></div>
-              </div>
-              <div class="bg-gray-900/50 p-4 rounded-xl border border-gray-700">
-                <div class="text-xs text-gray-500 uppercase tracking-wider">בונוס Relic</div>
-                <div id="relic-bonus-text" class="text-lg font-bold text-cyan-300"></div>
-              </div>
-            </div>
-
-            <div class="flex gap-4 justify-center">
-              <button onclick="AdventureGame.showView('map-view')" class="px-6 py-3 rounded-xl bg-gray-700 text-gray-300 hover:bg-gray-600 transition font-bold">
-                ביטול
-              </button>
-              <button onclick="AdventureGame.startChallenge()" class="px-8 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:from-pink-500 hover:to-purple-500 shadow-lg shadow-purple-900/50 transition transform hover:scale-105 font-bold flex items-center gap-2">
-                ⚔️ התחלי קרב!
-              </button>
-            </div>
-          </div>
-        </div>
+      <div style="text-align:center;">
+        <div style="font-size:4rem;animation:float 2.5s ease infinite;">${w.bossE}</div>
+        <div style="color:rgba(255,255,255,.55);font-size:.8rem;font-weight:700;margin-top:4px;">⚠️ בוס: <span style="color:${w.c};">${w.bossName}</span></div>
       </div>
-
-      <!-- GAME VIEW -->
-      <div id="game-view" class="view hidden">
-        <div class="flex justify-between items-center mb-4">
-          <div>
-            <h2 id="game-title" class="text-xl font-bold text-gray-200"></h2>
-            <p id="game-subtitle" class="text-sm text-gray-400"></p>
-          </div>
-          <button onclick="AdventureGame.showView('stage-challenge-view')" class="px-4 py-2 rounded-lg bg-gray-700 hover:bg-red-600 text-gray-200 text-sm font-bold transition flex items-center gap-2">
-            🔙 יציאה
-          </button>
-        </div>
-
-        <!-- Boss Bar (hidden unless boss) -->
-        <div id="boss-bar" class="hidden mb-4 bg-gray-800 border border-gray-700 rounded-xl p-3">
-          <div class="flex items-center justify-between mb-2">
-            <div class="font-bold text-pink-300" id="boss-name">בוס</div>
-            <div class="text-xs text-gray-400" id="boss-phase">שלב 1</div>
-          </div>
-          <div class="w-full h-3 bg-gray-900 rounded-full overflow-hidden border border-gray-700">
-            <div id="boss-hp" class="h-full bg-gradient-to-r from-pink-600 to-purple-600" style="width: 100%"></div>
-          </div>
-        </div>
-
-        <div id="game-content" class="flex flex-col items-center justify-center w-full"></div>
-
-        <!-- Feedback Area -->
-        <div class="mt-8 text-center min-h-[60px]">
-          <p id="feedback-message" class="text-2xl font-bold transition-all duration-300"></p>
-        </div>
-
-        <div class="flex justify-center gap-4 mt-2">
-          <button id="next-button" class="hidden px-8 py-3 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-500 transition font-bold">
-            המשך ➔
-          </button>
-          <button id="end-quiz-button" class="hidden px-8 py-3 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-500 transition font-bold" onclick="window.GameQuiz.finishQuiz()">
-            סיים וקבל ציון
-          </button>
-        </div>
-      </div>
-
-      <!-- Loading Overlay -->
-      <div id="loading-overlay" class="absolute inset-0 bg-gray-900 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mb-4"></div>
-        <p class="text-pink-400 font-bold">טוען לחשים...</p>
-      </div>
-
     </div>
-  </div>
+    <div style="padding:18px 14px 0;">
+      <p style="color:rgba(255,255,255,.4);font-size:.8rem;font-weight:700;margin-bottom:12px;text-align:center;">בחרי שלב:</p>
+      <div style="display:flex;flex-direction:column;gap:11px;">
+        ${w.levels.map((l,i)=>{
+          const ld=getLD(l.id),unlocked=lUnlocked(w.id,l.id),isBoss=l.type==='boss';
+          return `<div style="background:${isBoss?`linear-gradient(135deg,rgba(239,68,68,.15),rgba(220,38,38,.06))`:'rgba(255,255,255,.05)'};border:2px solid ${isBoss?(unlocked?'#ef444488':'rgba(239,68,68,.2)'):unlocked?w.c+'55':'rgba(255,255,255,.07)'};border-radius:22px;padding:15px;cursor:${unlocked?'pointer':'not-allowed'};${!unlocked?'opacity:.4':''};transition:all .2s;"
+            onclick="${unlocked?`startLevel(${w.id},'${l.id}')`:''}"
+            onmouseover="${unlocked?`this.style.transform='translateY(-3px)'`:''}" onmouseout="this.style.transform=''">
+            <div style="display:flex;align-items:center;gap:11px;">
+              <div style="width:46px;height:46px;border-radius:14px;background:${lTypeBg[l.type]}18;border:2px solid ${lTypeBg[l.type]}55;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">${unlocked?l.icon:'🔒'}</div>
+              <div style="flex:1;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-weight:900;font-size:.95rem;">${l.title}</span>
+                  <span>${[1,2,3].map(k=>k<=ld.stars?'⭐':'<span style="opacity:.12">⭐</span>').join('')}</span>
+                </div>
+                <div style="font-size:.75rem;font-weight:800;color:${lTypeBg[l.type]};margin-top:2px;">${lTypeName[l.type]}${ld.done?' ✅':''}</div>
+                <div style="font-size:.72rem;color:rgba(255,255,255,.35);font-weight:600;margin-top:2px;">${l.story}</div>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
 
-  <!-- Firebase & Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+/* ═══════════════════════════════════════
+   GAME ENGINE — SHARED STATE
+═══════════════════════════════════════ */
+let G={};
 
-    // -----------------------------
-    // DATA: WORLDS + STAGES (x12)
-    // -----------------------------
-    const WORLDS = [
-      {
-        worldId: "W1",
-        title: "עולם 1 - האולפן הרדוף",
-        tagline: "הכל מתחיל בחזרות... ואז מישהו לוחש: 'No English, no music.'",
-        icon: "🎧",
-        stages: [
-          {
-            stageId: 1,
-            worldId: "W1",
-            title: "חדר החזרות הרדוף",
-            narrative: "שד הבלבול משבש את שמות החפצים. כדי לגרש אותו, התאימי את המילים הנכונות לחפצים מהר.",
-            characterImage: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "match",
-            reward: { souls: 220, relic: false },
-            risk: "טעויות מורידות נקודות",
-            tip: "בחרי זוג אחד באנגלית וזוג אחד בעברית - אותו ID.",
-            unitData: {
-              vocabulary: [
-                { id: 101, en: "teacher", he: "מורה (לריקוד)" },
-                { id: 102, en: "friend", he: "חברה ללהקה" },
-                { id: 103, en: "desk", he: "שולחן איפור" },
-                { id: 104, en: "chair", he: "כיסא" },
-                { id: 105, en: "bag", he: "תיק אימון" },
-                { id: 106, en: "class", he: "שיעור" }
-              ]
-            },
-            successMessage: "השד גורש! חדר החזרות נקי. קיבלת נשמות!"
-          },
-          {
-            stageId: 2,
-            worldId: "W1",
-            title: "חוטי המיקרופון המקוללים",
-            narrative: "קווי הסאונד ננעלו בקסם. רק כתיבה מדויקת תפרום את הקשרים.",
-            characterImage: "https://images.unsplash.com/photo-1521337706264-a414f153a5a6?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "typing",
-            reward: { souls: 260, relic: true, relicName: "Shard of Clarity" },
-            risk: "טיימר קצר (במצב קשה)",
-            tip: "השלימי את המילה החסרה באנגלית בלי שגיאות.",
-            unitData: {
-              typing: [
-                { prompt: "I put my mic in my ____.", answer: "bag", hint: "תיק" },
-                { prompt: "We practice dance in the ____.", answer: "class", hint: "שיעור" },
-                { prompt: "Sit on the ____.", answer: "chair", hint: "כיסא" },
-                { prompt: "My ____ helps me.", answer: "friend", hint: "חברה" }
-              ]
-            },
-            successMessage: "הקשרים נפרמו! קווי הסאונד חזרו לעבוד."
-          },
-          {
-            stageId: 3,
-            worldId: "W1",
-            title: "מלכודת ההאזנה של ההד",
-            narrative: "רוח ההד מחקה קולות. כדי לברוח, עלייך לזהות את המילה ששמעת.",
-            characterImage: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "listening",
-            reward: { souls: 280, relic: false },
-            risk: "בלבול בין מילים דומות",
-            tip: "לחצי 'השמעה' ואז בחרי את המילה ששמעת.",
-            unitData: {
-              listening: [
-                { word: "teacher", options: ["teacher", "chair", "desk"] },
-                { word: "morning", options: ["evening", "morning", "friend"] },
-                { word: "desk", options: ["bag", "desk", "class"] },
-                { word: "chair", options: ["teacher", "chair", "class"] }
-              ]
-            },
-            successMessage: "שמעת נכון! ההד נשבר."
-          },
-          {
-            stageId: 4,
-            worldId: "W1",
-            title: "בוס עולם 1 - שד התדרים (The Frequency Fiend)",
-            narrative: "הבוס מזמזם תדר שגורם למילים להתבלבל. רק קרב רב-שלבי ישבור את הקסם: התאמות ואז שאלון בזק.",
-            characterImage: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "boss",
-            boss: { name: "The Frequency Fiend", phases: 2, hp: 100 },
-            reward: { souls: 500, relic: true, relicName: "Crown of Signal" },
-            risk: "ענישה חזקה על טעויות",
-            tip: "תנצחי שלב 1 (Match) ואז שלב 2 (Quiz).",
-            unitData: {
-              boss: {
-                phase1: {
-                  type: "match",
-                  vocabulary: [
-                    { id: 111, en: "morning", he: "בוקר" },
-                    { id: 112, en: "evening", he: "ערב" },
-                    { id: 113, en: "bag", he: "תיק" },
-                    { id: 114, en: "desk", he: "שולחן" }
-                  ]
-                },
-                phase2: {
-                  type: "quiz",
-                  quiz: [
-                    { q: "My ____ teaches me.", a: "teacher", options: ["teacher", "bag", "chair"], tip: "מי מלמד?" },
-                    { q: "We sit on a ____.", a: "chair", options: ["desk", "chair", "class"], tip: "איפה יושבים?" },
-                    { q: "In the ____ we practice.", a: "class", options: ["class", "kitchen", "house"], tip: "איפה מתאמנים?" }
-                  ]
-                }
-              }
-            },
-            successMessage: "התדר נשבר! האולפן ניצל."
+function initGame(wId,lId){
+  const w=WORLDS.find(x=>x.id===wId),l=w.levels.find(x=>x.id===lId);
+  const vocab=shuf(VOCAB.filter(v=>v.s===wId));
+  const maxH=ST.charId==='leila'?4:3;
+  G={wId,lId,l,w,vocab,hearts:maxH,maxH,combo:0,gems:0,correct:0,wrong:0,
+     wrongWords:[],shieldOn:false,powerBar:0,superUsed:false,
+     isGolden:false,goldenCount:0,
+     potions:{...ST.potions}};
+  if(l.type==='match')  startMatch();
+  else if(l.type==='quiz')  startQuiz();
+  else if(l.type==='speed') startSpeed();
+  else if(l.type==='boss')  startBoss();
+}
+
+/* ── POWER BAR & SUPER ── */
+function chargePower(){
+  if(G.superUsed)return;
+  G.powerBar=Math.min(5,G.powerBar+1);
+  updatePowerBar();
+}
+function updatePowerBar(){
+  document.querySelectorAll('.power-seg').forEach((s,i)=>{
+    s.classList.toggle('lit',i<G.powerBar);
+  });
+  const sb=document.getElementById('super-btn');
+  if(sb){sb.classList.toggle('ready',G.powerBar>=5);sb.disabled=G.powerBar<5||G.superUsed;}
+}
+function useSuper(){
+  if(G.powerBar<5||G.superUsed)return;
+  if(G.l.type==='boss' && (G.bAns || G.bPaused)) return; // Prevent breaking boss transitions
+  
+  G.superUsed=true;G.powerBar=0;ST.superUsed++;saveST();
+  
+  // Awesome Flash Effect
+  const sf = document.createElement('div');
+  sf.className = 'super-flash';
+  document.body.appendChild(sf);
+  setTimeout(()=>sf.remove(), 1000);
+  
+  toast('⚡ מכת על! (SUPER!)', 2500);
+  shake(true);
+  
+  if(G.l.type==='boss'){
+      G.bAns = true; G.bPaused = true;
+      clearTimers(); if(_shuffleTick)clearInterval(_shuffleTick);
+      
+      const pE = document.getElementById('player-emoji');
+      if(pE) { pE.classList.add('pDash'); setTimeout(()=>pE.classList.remove('pDash'), 300); }
+      shootProjectile('player-emoji', 'boss-emoji', '⚡', true);
+      
+      setTimeout(()=>{
+          const prevHp = G.bHp;
+          G.bHp = Math.max(0, G.bHp - 2); // 2 HP massive damage
+          dmgNum('💥 -2 HP (SUPER!)', true, 65, 35);
+          
+          const fill = document.getElementById('boss-hp-fill');
+          if(fill) fill.style.width = (G.bHp/G.bMaxHp*100)+'%';
+          
+          if(G.bHp <= 0){ killBoss(); return; }
+          
+          if(!checkPhaseTransitions(prevHp)){
+              G.bPaused = false;
+              nextBossTurn();
           }
-        ]
-      },
-
-      {
-        worldId: "W2",
-        title: "עולם 2 - המעונות והמסדרונות",
-        tagline: "דלתות נסגרות. שלטים זזים. ורק משפט אחד נכון פותח מנעול.",
-        icon: "🏢",
-        stages: [
-          {
-            stageId: 5,
-            worldId: "W2",
-            title: "המעונות המקוללים",
-            narrative: "רוח עתיקה נעלה את הדלתות. היא דורשת שינון של מילים על בית ומשפחה.",
-            characterImage: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "flashcards",
-            reward: { souls: 320, relic: false },
-            risk: "אין",
-            tip: "הפכי כרטיס, השמעה, ואז 'הבא'.",
-            unitData: {
-              vocabulary: [
-                { id: 201, en: "mother", he: "אמא" },
-                { id: 202, en: "father", he: "אבא" },
-                { id: 203, en: "house", he: "בית" },
-                { id: 204, en: "kitchen", he: "מטבח" },
-                { id: 205, en: "eat", he: "לאכול" },
-                { id: 206, en: "sleep", he: "לישון" },
-                { id: 207, en: "brother", he: "אח" },
-                { id: 208, en: "sister", he: "אחות" }
-              ]
-            },
-            successMessage: "הדלתות נפתחו. הרוח נרגעה."
-          },
-          {
-            stageId: 6,
-            worldId: "W2",
-            title: "דו-קרב מסדרון (Dialogue Duel)",
-            narrative: "שד החיקוי מתחזה לאיידול. תנצחי אותו בשיחה: בחרי את התגובה הנכונה באנגלית.",
-            characterImage: "https://images.unsplash.com/photo-1520975958225-7f61d8d0f06b?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "dialogue",
-            reward: { souls: 360, relic: true, relicName: "Mask of Politeness" },
-            risk: "תגובה שגויה מורידה נקודות",
-            tip: "שימי לב לנימוס (please, thanks) ולמילות קישור (because, but).",
-            unitData: {
-              dialogue: [
-                {
-                  npc: "Stranger",
-                  line: "Hi! Are you new here?",
-                  options: [
-                    { text: "Yes, I am. Nice to meet you.", correct: true },
-                    { text: "Kitchen bag teacher.", correct: false },
-                    { text: "No, sleep desk.", correct: false }
-                  ]
-                },
-                {
-                  npc: "Stranger",
-                  line: "Where is the kitchen?",
-                  options: [
-                    { text: "It is on the first floor.", correct: true },
-                    { text: "I am a sister.", correct: false },
-                    { text: "Good evening bag.", correct: false }
-                  ]
-                },
-                {
-                  npc: "Stranger",
-                  line: "Do you want to eat now?",
-                  options: [
-                    { text: "Yes, please. I'm hungry.", correct: true },
-                    { text: "Teacher chair.", correct: false },
-                    { text: "No, class desk.", correct: false }
-                  ]
-                }
-              ]
-            },
-            successMessage: "התחזות נחשפה. המסדרון נקי."
-          },
-          {
-            stageId: 7,
-            worldId: "W2",
-            title: "חותם הכתיבה המהירה",
-            narrative: "דלת ברזל עם חותם דורשת השלמה של משפטים בסיסיים על משפחה ובית.",
-            characterImage: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "typing",
-            reward: { souls: 380, relic: false },
-            risk: "במצב קשה - 2 טעויות סוגרות את הדלת",
-            tip: "הקלדה מדויקת בלבד - בלי רווחים מיותרים.",
-            unitData: {
-              typing: [
-                { prompt: "My ____ is at home.", answer: "mother", hint: "אמא" },
-                { prompt: "We ____ in the kitchen.", answer: "eat", hint: "לאכול" },
-                { prompt: "I ____ at night.", answer: "sleep", hint: "לישון" }
-              ]
-            },
-            successMessage: "החותם נשבר. הדלת נפתחה."
-          },
-          {
-            stageId: 8,
-            worldId: "W2",
-            title: "בוס עולם 2 - שד הנימוסים (The Etiquette Wraith)",
-            narrative: "הבוס מעניש כל משפט לא מנומס. תצטרכי לנצח דיאלוג ואז מבחן קצר.",
-            characterImage: "https://images.unsplash.com/photo-1520975682045-481d9c6b09fb?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "boss",
-            boss: { name: "The Etiquette Wraith", phases: 2, hp: 110 },
-            reward: { souls: 560, relic: true, relicName: "Charm of Please" },
-            risk: "טעויות = פגיעה גדולה",
-            tip: "חפשי מילות נימוס ותגובות טבעיות.",
-            unitData: {
-              boss: {
-                phase1: { type: "dialogue",
-                  dialogue: [
-                    {
-                      npc: "Wraith",
-                      line: "Ask for help politely.",
-                      options: [
-                        { text: "Can you help me, please?", correct: true },
-                        { text: "Help me now.", correct: false },
-                        { text: "Bag kitchen.", correct: false }
-                      ]
-                    },
-                    {
-                      npc: "Wraith",
-                      line: "Say thank you.",
-                      options: [
-                        { text: "Thank you!", correct: true },
-                        { text: "No.", correct: false },
-                        { text: "Sleep chair.", correct: false }
-                      ]
-                    }
-                  ]
-                },
-                phase2: { type: "quiz",
-                  quiz: [
-                    { q: "Choose the polite sentence:", a: "Can I come in, please?", options: ["Come in!", "Can I come in, please?", "Kitchen desk"], tip: "נימוס" },
-                    { q: "A polite response to 'Thank you' is:", a: "You're welcome.", options: ["You're welcome.", "Bag!", "Teacher."], tip: "תשובה מנומסת" }
-                  ]
-                }
-              }
-            },
-            successMessage: "הבוס נמס. המסדרונות חזרו להיות שקטים."
-          }
-        ]
-      },
-
-      {
-        worldId: "W3",
-        title: "עולם 3 - העיר שמתחת לבמה",
-        tagline: "מתחת לאצטדיון מסתתרת עיר שלטונית של שדים - והחוקים שם באנגלית.",
-        icon: "🏟️",
-        stages: [
-          {
-            stageId: 9,
-            worldId: "W3",
-            title: "שוק הצללים",
-            narrative: "סוחרי-רוחות מחליפים מילים. תצטרכי לזהות את המילה הנכונה לפי רמז.",
-            characterImage: "https://images.unsplash.com/photo-1520975682037-6e9b5563c8bf?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "quiz",
-            reward: { souls: 420, relic: false },
-            risk: "אפשרויות מבלבלות",
-            tip: "קראי את הרמז בעברית, ועני באנגלית.",
-            unitData: {
-              quiz: [
-                { q: "I am not hungry. I don't want to ____.", a: "eat", options: ["eat", "sleep", "desk"], tip: "לאכול" },
-                { q: "At night I ____.", a: "sleep", options: ["sleep", "teacher", "kitchen"], tip: "לישון" },
-                { q: "My ____ sings with me.", a: "sister", options: ["sister", "house", "bag"], tip: "אחות" }
-              ]
-            },
-            successMessage: "סוחרי הצללים נסוגו."
-          },
-          {
-            stageId: 10,
-            worldId: "W3",
-            title: "חדר החזרות השני - שדרוג",
-            narrative: "אותו חדר, אבל השד לומד. הפעם צריך התאמות עם יותר מילים ובזמן קצר.",
-            characterImage: "https://images.unsplash.com/photo-1497032205916-ac775f0649ae?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "match",
-            reward: { souls: 460, relic: true, relicName: "Lens of Speed" },
-            risk: "במצב קשה - פחות זמן בין ניסיונות",
-            tip: "תתרכזי בזוגות ואל תגררי - טעויות עולות ביוקר.",
-            unitData: {
-              vocabulary: [
-                { id: 301, en: "morning", he: "בוקר" },
-                { id: 302, en: "evening", he: "ערב" },
-                { id: 303, en: "mother", he: "אמא" },
-                { id: 304, en: "father", he: "אבא" },
-                { id: 305, en: "kitchen", he: "מטבח" },
-                { id: 306, en: "house", he: "בית" }
-              ]
-            },
-            successMessage: "החדר היטהר. את מתקדמת מהר."
-          },
-          {
-            stageId: 11,
-            worldId: "W3",
-            title: "מבחן ההאזנה - קול המנהל",
-            narrative: "קול עמוק בוקע מהרמקולים. רק מי שמזהה את המילים ימשיך.",
-            characterImage: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "listening",
-            reward: { souls: 500, relic: false },
-            risk: "מילים ארוכות יותר",
-            tip: "השמעה, ואז בחירה. אם צריך - השמעה שוב.",
-            unitData: {
-              listening: [
-                { word: "mother", options: ["mother", "brother", "teacher"] },
-                { word: "kitchen", options: ["kitchen", "house", "class"] },
-                { word: "evening", options: ["morning", "evening", "sister"] },
-                { word: "brother", options: ["brother", "father", "desk"] }
-              ]
-            },
-            successMessage: "הקול שקט. הדלת נפתחה."
-          },
-          {
-            stageId: 12,
-            worldId: "W3",
-            title: "בוס עולם 3 - שד השתיקה (The Silence King)",
-            narrative: "הבוס מנסה להשתיק את המוזיקה לנצח. הקרב הסופי: הקלדה מדויקת ואז שאלון מהיר.",
-            characterImage: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=1200&auto=format&fit=crop",
-            challengeType: "boss",
-            boss: { name: "The Silence King", phases: 2, hp: 130 },
-            reward: { souls: 900, relic: true, relicName: "Mic of Dawn" },
-            risk: "קרב ארוך - לשמור על ריכוז",
-            tip: "אל תמהרי בהקלדה - דיוק לפני מהירות.",
-            unitData: {
-              boss: {
-                phase1: { type: "typing",
-                  typing: [
-                    { prompt: "We cook ramen in the ____.", answer: "kitchen", hint: "מטבח" },
-                    { prompt: "My ____ sings with me.", answer: "sister", hint: "אחות" },
-                    { prompt: "Good ____! (after 6pm)", answer: "evening", hint: "ערב" }
-                  ]
-                },
-                phase2: { type: "quiz",
-                  quiz: [
-                    { q: "We practice dance in the _____.", a: "class", options: ["kitchen", "class", "bag"], tip: "איפה מתאמנים?" },
-                    { q: "I put my mic in my _____.", a: "bag", options: ["chair", "bag", "father"], tip: "איפה שמים דברים?" },
-                    { q: "My _____ is my dad.", a: "father", options: ["father", "desk", "sleep"], tip: "אבא" },
-                    { q: "At night I ____.", a: "sleep", options: ["sleep", "eat", "chair"], tip: "לישון" }
-                  ]
-                }
-              }
-            },
-            successMessage: "🎉 ההופעה ניצלה! את ציידת אגדית. סיימת את שלושת העולמות הראשונים!"
-          }
-        ]
-      }
-    ];
-
-    // -----------------------------
-    // GLOBAL STATE + PERSISTENCE
-    // -----------------------------
-    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-    let app, db, auth;
-    let userId = null;
-
-    // Progress model
-    let globalScore = 0;
-    let globalHighScore = 0;
-
-    let playerProgress = {
-      currentStageId: 1,
-      completedStages: {},
-      relics: {},
-      hardMode: false
-    };
-
-    let currentStageData = null;
-
-    // -----------------------------
-    // DOM REFS
-    // -----------------------------
-    const views = {
-      map: document.getElementById('map-view'),
-      challenge: document.getElementById('stage-challenge-view'),
-      game: document.getElementById('game-view')
-    };
-
-    const elements = {
-      worldsList: document.getElementById('worlds-list'),
-      stageTitle: document.getElementById('stage-title'),
-      stageMeta: document.getElementById('stage-meta'),
-      stageNarrative: document.getElementById('stage-narrative'),
-      stageImg: document.getElementById('stage-character-img'),
-      instructions: document.getElementById('challenge-instructions'),
-      tip: document.getElementById('challenge-tip'),
-      rewardText: document.getElementById('reward-text'),
-      riskText: document.getElementById('risk-text'),
-      relicBonusText: document.getElementById('relic-bonus-text'),
-
-      gameTitle: document.getElementById('game-title'),
-      gameSubtitle: document.getElementById('game-subtitle'),
-      gameContent: document.getElementById('game-content'),
-
-      score: document.getElementById('current-score'),
-      highScore: document.getElementById('high-score'),
-      relicsCount: document.getElementById('relics-count'),
-      feedback: document.getElementById('feedback-message'),
-
-      nextBtn: document.getElementById('next-button'),
-      endQuizBtn: document.getElementById('end-quiz-button'),
-
-      bossBar: document.getElementById('boss-bar'),
-      bossName: document.getElementById('boss-name'),
-      bossPhase: document.getElementById('boss-phase'),
-      bossHp: document.getElementById('boss-hp'),
-
-      loading: document.getElementById('loading-overlay'),
-      userId: document.getElementById('user-id-display'),
-      hardModeInd: document.getElementById('hard-mode-ind')
-    };
-
-    // -----------------------------
-    // Helpers
-    // -----------------------------
-    const flattenStages = () => WORLDS.flatMap(w => w.stages);
-
-    function relicsTotal() {
-      return Object.keys(playerProgress.relics || {}).length;
-    }
-
-    function relicBonusMultiplier() {
-      // Tiny, harmless bonus: +1% per relic (cap 10%)
-      const bonus = Math.min(0.10, relicsTotal() * 0.01);
-      return 1 + bonus;
-    }
-
-    function awardRelicIfAny(stage) {
-      if (stage.reward?.relic && stage.reward?.relicName) {
-        playerProgress.relics[stage.reward.relicName] = true;
-      }
-    }
-
-    function hardPenalty() {
-      return playerProgress.hardMode ? 2 : 1;
-    }
-
-    function formatStageType(t) {
-      const m = {
-        match: "התאמות",
-        flashcards: "כרטיסיות",
-        quiz: "שאלון",
-        typing: "הקלדה",
-        listening: "האזנה",
-        dialogue: "דיאלוג",
-        boss: "בוס"
-      };
-      return m[t] || t;
-    }
-
-    // -----------------------------
-    // Init App
-    // -----------------------------
-    async function initApp() {
-      // Render immediately (offline-safe)
-      window.AdventureGame.renderMap();
-
-      // Try firebase
-      try {
-        if (Object.keys(firebaseConfig).length > 0) {
-          app = initializeApp(firebaseConfig);
-          db = getFirestore(app);
-          auth = getAuth(app);
-
-          if (initialAuthToken) await signInWithCustomToken(auth, initialAuthToken);
-          else await signInAnonymously(auth);
-
-          onAuthStateChanged(auth, (user) => {
-            if (user) {
-              userId = user.uid;
-              elements.userId.textContent = `ציידת מחוברת: ${userId.substring(0, 6)}...`;
-              loadData();
-            }
-          });
-        } else {
-          elements.loading.classList.add('opacity-0', 'pointer-events-none');
-          elements.userId.textContent = "מצב אופליין (לא שומר התקדמות)";
-          loadLocal();
-          updateUI();
+      }, 350);
+  } else {
+      // Normal mode: auto-reveal correct option
+      document.querySelectorAll('.opt').forEach(b=>{
+        if(b.dataset.correct==='true'){
+            b.style.borderColor='#f59e0b';
+            b.style.background='rgba(245,158,11,.25)';
+            b.style.boxShadow='0 0 20px rgba(245,158,11,.6)';
         }
-      } catch (e) {
-        console.error("Auth failed", e);
-        elements.loading.classList.add('opacity-0', 'pointer-events-none');
-        elements.userId.textContent = "שגיאת חיבור (מצב אופליין)";
-        loadLocal();
-        updateUI();
-      }
-    }
-
-    function localKey() {
-      return `demon_hunter_local_${appId}`;
-    }
-
-    function saveLocal() {
-      try {
-        const payload = { playerProgress, globalScore, globalHighScore };
-        localStorage.setItem(localKey(), JSON.stringify(payload));
-      } catch {}
-    }
-
-    function loadLocal() {
-      try {
-        const raw = localStorage.getItem(localKey());
-        if (!raw) return;
-        const d = JSON.parse(raw);
-        playerProgress = d.playerProgress || playerProgress;
-        globalScore = d.globalScore || 0;
-        globalHighScore = d.globalHighScore || 0;
-      } catch {}
-    }
-
-    function resetLocal() {
-      try { localStorage.removeItem(localKey()); } catch {}
-      playerProgress = { currentStageId: 1, completedStages: {}, relics: {}, hardMode: false };
-      globalScore = 0;
-      globalHighScore = 0;
-      updateUI();
-      AdventureGame.showView('map-view');
-      elements.feedback.textContent = "";
-    }
-
-    function loadData() {
-      if (!userId || !db) return;
-      const ref = doc(db, `artifacts/${appId}/users/${userId}/demon_hunter_progress/data`);
-      onSnapshot(ref, (snap) => {
-        if (snap.exists()) {
-          const d = snap.data();
-          playerProgress = d.progress || playerProgress;
-          globalHighScore = d.highScore || 0;
-          globalScore = d.currentScore || 0;
-        } else {
-          // maybe restore local if exists
-          loadLocal();
-        }
-        updateUI();
-        elements.loading.classList.add('opacity-0', 'pointer-events-none');
       });
+  }
+  updatePowerBar();checkAch();
+}
+function renderPowerBar(){
+  return `<div class="power-bar-wrap">
+    <span style="font-size:.75rem;font-weight:900;color:rgba(255,255,255,.5);">⚡</span>
+    <div class="power-segments">${[0,1,2,3,4].map(i=>`<div class="power-seg${i<G.powerBar?' lit':''}"></div>`).join('')}</div>
+    <button id="super-btn" class="super-btn${G.powerBar>=5&&!G.superUsed?' ready':''}" onclick="useSuper()" ${G.powerBar<5||G.superUsed?'disabled':''}>SUPER!</button>
+  </div>`;
+}
+
+/* ── POTION BAR ── */
+function renderPotionBar(){
+  const p=G.potions;
+  return `<div class="potion-bar">
+    <button class="pot-btn" onclick="usePotion('hint')" ${!p.hint?'disabled':''}>💡 רמז (${p.hint||0})</button>
+    <button class="pot-btn" onclick="usePotion('shield')" ${!p.shield?'disabled':''}>🛡️ מגן (${p.shield||0})</button>
+    <button class="pot-btn" style="color:#f59e0b;border-color:rgba(245,158,11,.3);" onclick="go('shop')">🛒</button>
+  </div>`;
+}
+function usePotion(type){
+  if(type==='hint'){
+    if(!G.potions.hint){toast('אין רמזים!');return;}
+    G.potions.hint--;
+    const wrongs=[...document.querySelectorAll('.opt')].filter(b=>b.dataset.correct!=='true'&&!b.disabled);
+    shuf(wrongs).slice(0,2).forEach(b=>{b.disabled=true;b.style.opacity='.15';});
+    toast('💡 שני אפשרויות הוסרו!');
+  } else if(type==='shield'){
+    if(!G.potions.shield){toast('אין מגן!');return;}
+    G.potions.shield--;G.shieldOn=true;toast('🛡️ מגן הופעל!');
+  }
+  ST.potions={...G.potions};saveST();
+  document.querySelectorAll('.pot-btn').forEach((b,i)=>{
+    if(i===0){b.textContent=`💡 רמז (${G.potions.hint||0})`;b.disabled=!G.potions.hint;}
+    if(i===1){b.textContent=`🛡️ מגן (${G.potions.shield||0})`;b.disabled=!G.potions.shield;}
+  });
+}
+
+/* ── HUD ── */
+function renderHUD(title,color){
+  const hArr=Array.from({length:G.maxH},(_,i)=>i<G.hearts?'❤️':'🖤');
+  const cClass=G.combo>=20?'combo-10':G.combo>=10?'combo-10':G.combo>=5?'combo-5':G.combo>=2?'combo-2':'';
+  return `<div class="hud">
+    <button class="btn-back" onclick="go('world',${G.wId})">←</button>
+    <div style="flex:1;">
+      <div style="font-size:.75rem;font-weight:800;color:${color};">${title}</div>
+      <div style="display:flex;gap:2px;margin-top:1px;">${hArr.map((h,i)=>`<span class="heart${i>=G.hearts?' lost':''}">${h}</span>`).join('')}</div>
+    </div>
+    ${G.combo>=2?`<div class="combo-badge ${cClass}">🔥 x${G.combo>=20?4:G.combo>=10?3:G.combo>=5?2:2} combo</div>`:''}
+    <div id="hud-gems-wrap" class="gems-hud">💎 <span id="hud-gems">${ST.gems}</span></div>
+  </div>`;
+}
+
+/* ── SHARED CORRECT/WRONG ── */
+function onCorrect(word){
+  G.combo++;G.correct++;ST.totalCorrect++;
+  if(G.combo>ST.comboRecord)ST.comboRecord=G.combo;
+  const base=G.isGolden?50:10;
+  const mult=G.combo>=10?4:G.combo>=5?3:G.combo>=3?2:1;
+  const earned=base*mult;
+  G.gems+=earned;addGems(earned);addXP(15);
+  if(word){const k=`${word.s}_${word.en}`;ST.mastery[k]=Math.min(3,(ST.mastery[k]||0)+1);saveST();}
+  if(G.isGolden){G.goldenCount++;ST.goldenHits++;saveST();}
+  G.isGolden=false;
+  chargePower();
+  flyGems(G.combo>=5?5:2);
+  showComboFlash(G.combo);
+  checkAch();updateHUD();
+}
+function onWrong(word){
+  G.isGolden=false;
+  if(G.shieldOn){G.shieldOn=false;toast('🛡️ מגן ספג טעות!');return;}
+  const prev=G.combo;
+  G.combo=0;G.wrong++;
+  G.hearts=Math.max(0,G.hearts-1);
+  if(word)G.wrongWords.push(word);
+  if(word){const k=`${word.s}_${word.en}`;if(!(k in ST.mastery))ST.mastery[k]=0;saveST();}
+  shake(G.hearts===0);
+  updateHUD();
+  if(G.hearts<=0)setTimeout(()=>showFailed(),400);
+}
+
+/* ═══════════════════════════════════════
+   MATCH
+═══════════════════════════════════════ */
+function startMatch(){
+  G.allPairs=shuf([...G.vocab]);G.mRound=0;G.mPPC=4;G.mMatched=new Set();G.mSel=null;G.mCards=[];
+  nextMatchRound();
+}
+function nextMatchRound(){
+  const sl=G.allPairs.slice(G.mRound*G.mPPC,(G.mRound+1)*G.mPPC);
+  if(!sl.length){finishLevel();return;}
+  const he=sl.map((w,i)=>({id:`h${i}`,txt:w.e+' '+w.he,pid:i,lang:'he',w}));
+  const en=sl.map((w,i)=>({id:`e${i}`,txt:w.en,pid:i,lang:'en',w}));
+  G.mCards=shuf([...he,...en]);G.mMatched=new Set();G.mSel=null;
+  renderMatch();
+}
+function renderMatch(){
+  const rounds=Math.ceil(G.allPairs.length/G.mPPC);
+  document.getElementById('app').innerHTML=`<div class="screen" style="background:radial-gradient(ellipse at 50% 0%,${G.w.c}18 0%,#08081a 50%);min-height:100vh;">
+    ${renderHUD(`🔗 חיבורים · סבב ${G.mRound+1}/${rounds}`,G.w.c)}
+    ${renderPotionBar()}
+    ${renderPowerBar()}
+    <p style="text-align:center;color:rgba(255,255,255,.4);font-size:.78rem;font-weight:700;padding:8px 0 2px;">חבר/י זוג: עברית ↔ אנגלית</p>
+    <div class="match-grid">
+      ${G.mCards.map(c=>{const ok=G.mMatched.has(c.pid),sel=G.mSel&&G.mSel.id===c.id;
+        return `<div class="mc${ok?' ok dis':sel?' sel':''}" id="mc_${c.id}" style="${c.lang==='en'?'direction:ltr;':''}" onclick="mClick('${c.id}')">${c.txt}</div>`;}).join('')}
+    </div>
+  </div>`;
+}
+function mClick(id){
+  const card=G.mCards.find(c=>c.id===id);if(!card||G.mMatched.has(card.pid))return;
+  if(!G.mSel){G.mSel=card;renderMatch();return;}
+  if(G.mSel.id===id){G.mSel=null;renderMatch();return;}
+  const prev=G.mSel;G.mSel=null;
+  if(prev.pid===card.pid&&prev.lang!==card.lang){
+    G.mMatched.add(card.pid);onCorrect(card.w);
+    ['mc_'+prev.id,'mc_'+card.id].forEach(eid=>{const e=document.getElementById(eid);if(e){e.className='mc ok dis';e.classList.add('anim-pop');}});
+    const sl=G.allPairs.slice(G.mRound*G.mPPC,(G.mRound+1)*G.mPPC);
+    if(G.mMatched.size>=sl.length)setTimeout(()=>{confetti({particleCount:60,spread:60,origin:{y:.65}});G.mRound++;nextMatchRound();},700);
+  } else {
+    onWrong(card.w);
+    ['mc_'+prev.id,'mc_'+card.id].forEach(eid=>{const e=document.getElementById(eid);if(e){e.classList.add('err');setTimeout(()=>e.classList.remove('err'),450);}});
+    if(G.hearts>0)setTimeout(()=>{G.mSel=null;renderMatch();},480);
+  }
+}
+
+/* ═══════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════ */
+function startQuiz(){G.qQueue=shuf([...G.vocab]);G.qCur=0;G.qAns=false;renderQuiz();}
+function renderQuiz(){
+  if(G.qCur>=G.qQueue.length){finishLevel();return;}
+  const w=G.qQueue[G.qCur],prog=G.qCur/G.qQueue.length*100;
+  G.isGolden=Math.random()<0.08;
+  const opts=shuf([w.en,...randDist(w.en,3)]);
+  document.getElementById('app').innerHTML=`<div class="screen" style="background:radial-gradient(ellipse at 50% 0%,${G.w.c}18 0%,#08081a 50%);min-height:100vh;">
+    ${renderHUD(`🧠 חידון · ${G.qCur+1}/${G.qQueue.length}`,G.w.c)}
+    ${renderPotionBar()}
+    ${renderPowerBar()}
+    <div class="pbar" style="margin:6px 14px;"><div class="pfill" style="width:${prog}%;background:${G.w.c};"></div></div>
+    <div class="q-card${G.isGolden?' golden':''}">
+      <div class="q-emoji">${w.e}</div>
+      <div class="q-he">${w.he}</div>
+      ${G.isGolden?`<div class="gold-badge">✨ מילת זהב! x5 💎</div>`:''}
+    </div>
+    <div class="opts-grid" id="opts-wrap">
+      ${opts.map(o=>`<button class="opt" dir="ltr" data-correct="${o===w.en}" onclick="checkQuiz('${o.replace(/'/g,"\\'")}','${w.en.replace(/'/g,"\\'")}',${G.qCur})">${o}</button>`).join('')}
+    </div>
+  </div>`;
+}
+function checkQuiz(chosen,correct,idx){
+  if(G.qAns)return;G.qAns=true;
+  document.querySelectorAll('.opt').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent.trim()===correct)b.classList.add('correct');
+    else if(b.textContent.trim()===chosen&&chosen!==correct)b.classList.add('wrong');
+  });
+  if(chosen===correct){onCorrect(G.qQueue[idx]);dmgNum(G.isGolden?'+50 ✨':'+'+( G.combo>=5?30:G.combo>=3?20:10)+'💎',true);}
+  else{onWrong(G.qQueue[idx]);dmgNum('✗',false);}
+  if(G.hearts>0)setTimeout(()=>{G.qCur++;G.qAns=false;renderQuiz();},950);
+}
+
+/* ═══════════════════════════════════════
+   SPEED
+═══════════════════════════════════════ */
+function startSpeed(){
+  G.spWords=shuf([...G.vocab]);G.spCur=0;G.spAns=false;
+  G.spTime=ST.charId==='dana'?48:45;G.spCorrect=0;
+  renderSpeed();
+  _spTick=setInterval(()=>{
+    G.spTime--;
+    const el=document.getElementById('sp-t');if(el)el.textContent=G.spTime;
+    const tc=G.spTime>20?'#26de81':G.spTime>10?'#f7b731':'#ef4444';
+    if(el)el.style.color=tc;
+    const bf=document.getElementById('sp-bar');if(bf){bf.style.width=(G.spTime/(ST.charId==='dana'?48:45)*100)+'%';bf.style.background=tc;}
+    if(G.spTime<=0){clearInterval(_spTick);_spTick=null;finishLevel();}
+  },1000);
+}
+function renderSpeed(){
+  if(G.spCur>=G.spWords.length){G.spWords=shuf([...G.vocab]);G.spCur=0;}
+  const w=G.spWords[G.spCur],tot=ST.charId==='dana'?48:45;
+  const tc=G.spTime>20?'#26de81':G.spTime>10?'#f7b731':'#ef4444';
+  G.isGolden=Math.random()<0.06;
+  const opts=shuf([w.en,...randDist(w.en,3)]);
+  document.getElementById('app').innerHTML=`<div class="screen" style="background:radial-gradient(ellipse at 50% 0%,#1a0a00 0%,#08081a 50%);min-height:100vh;">
+    ${renderHUD(`⚡ מהירות · ✅ ${G.spCorrect}`,G.w.c)}
+    ${renderPowerBar()}
+    <div style="padding:8px 14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+        <div class="ff" id="sp-t" style="font-size:2.2rem;color:${tc};">${G.spTime}</div>
+        ${G.isGolden?`<div class="gold-badge">✨ מילת זהב!</div>`:''}
+        <div class="ff" style="font-size:1.1rem;color:rgba(255,255,255,.6);">🎯 ${G.spCorrect}</div>
+      </div>
+      <div style="height:10px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden;">
+        <div id="sp-bar" style="height:100%;width:${G.spTime/tot*100}%;background:${tc};border-radius:10px;transition:width .9s linear;"></div>
+      </div>
+    </div>
+    <div class="q-card${G.isGolden?' golden':''}">
+      <div class="q-emoji">${w.e}</div>
+      <div class="q-he">${w.he}</div>
+    </div>
+    <div class="opts-grid">
+      ${opts.map(o=>`<button class="opt" dir="ltr" data-correct="${o===w.en}" onclick="checkSpeed('${o.replace(/'/g,"\\'")}','${w.en.replace(/'/g,"\\'")}',${G.spCur})">${o}</button>`).join('')}
+    </div>
+  </div>`;
+}
+function checkSpeed(chosen,correct,idx){
+  if(G.spAns)return;G.spAns=true;
+  const w=G.spWords[G.spCur%G.spWords.length];
+  if(chosen===correct){G.spCorrect++;onCorrect(w);dmgNum('+💎',true);}
+  else{onWrong(w);}
+  if(G.hearts>0&&G.spTime>0)setTimeout(()=>{G.spCur++;G.spAns=false;renderSpeed();},420);
+  if(G.spCorrect>=10)grantAch('speed10');
+}
+
+/* ═══════════════════════════════════════
+   BOSS BATTLE
+═══════════════════════════════════════ */
+function getBossPhase(){const r=G.bHp/G.bMaxHp;return r>.66?'normal':r>.33?'angry':'enraged';}
+function getBossTimerDur(){const ph=getBossPhase();const base=ST.charId==='dana'?11:8;return ph==='enraged'?Math.max(4,base-3):ph==='angry'?Math.max(5,base-1):base;}
+function getBossTaunt(){const phase=getBossPhase(),pool=G.w.taunts[phase];return pool[Math.floor(Math.random()*pool.length)];}
+
+function startBoss(){
+  G.bHp=G.w.bossHp;G.bMaxHp=G.w.bossHp;
+  G.bQueue=shuf([...G.vocab]);G.bCur=0;G.bAns=false;G.bPaused=false;
+  G.bSpecial=false;G.bSpecialTurns=0;G.bHitSpecial=false;
+  G.bTime=getBossTimerDur();G.bTaunt=getBossTaunt();
+  renderBoss();startBossTick();
+}
+
+function renderBoss(){
+  if(G.bHp<=0){clearTimers();showChestOpening();return;}
+  const w=G.bQueue[G.bCur%G.bQueue.length];
+  G.isGolden=Math.random()<0.07;
+  const opts=shuf([w.en,...randDist(w.en,3)]);
+  const phase=getBossPhase();
+  const hpPct=G.bHp/G.bMaxHp*100;
+  const ch=getChar();
+  const tc=G.bTime<=3?'#ef4444':G.bTime<=5?'#f7b731':'#26de81';
+  const timerTotal=getBossTimerDur();
+  const circC=2*Math.PI*20;
+  const cirDash=circC*G.bTime/timerTotal;
+  const phaseBadge=phase==='enraged'?`<div class="phase-badge phase-enraged">💀 ENRAGED</div>`:phase==='angry'?`<div class="phase-badge phase-angry">⚠️ ANGRY</div>`:`<div class="phase-badge phase-normal">● normal</div>`;
+  document.getElementById('app').innerHTML=`
+    <div class="screen" style="background:radial-gradient(ellipse at 50% 20%,${phase==='enraged'?'#2a0505':phase==='angry'?'#1a0d00':'#0a0a1a'} 0%,#08081a 70%);min-height:100vh;">
+      ${phase==='enraged'?`<div class="enrage-tint"></div>`:''}
+      ${renderHUD(`👹 ${G.w.bossName}`,G.w.c)}
+      ${renderPowerBar()}
+      <div class="arena">
+        <div class="arena-row">
+          <div class="fighter-box">
+            <div class="hp-label">❤️ שחקן</div>
+            <div class="hp-bar" style="background:rgba(255,255,255,.1);">
+              <div class="hp-fill" style="width:${G.hearts/G.maxH*100}%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>
+            </div>
+            <div class="fighter-emoji" id="player-emoji" style="animation:float 2.5s ease infinite;">${ch.e}</div>
+            <div class="ff" style="font-size:.82rem;color:${ch.c};">${ch.name}</div>
+          </div>
+          <div class="vs-divider">VS</div>
+          <div class="fighter-box">
+            <div class="hp-label">💀 בוס</div>
+            <div class="hp-bar">
+              <div class="hp-fill" id="boss-hp-fill" style="width:${hpPct}%;background:linear-gradient(90deg,#ef4444,#f59e0b);"></div>
+            </div>
+            <div class="fighter-emoji ${phase==='enraged'?'enraged':phase==='angry'?'angry':''}" id="boss-emoji">${G.w.bossE}</div>
+            ${phaseBadge}
+          </div>
+        </div>
+        <div class="boss-dialogue" id="boss-dialogue">"${G.bTaunt}"</div>
+      </div>
+      <div class="timer-ring-wrap">
+        <div class="timer-ring">
+          <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="22" cy="22" r="20" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="3.5"/>
+            <circle cx="22" cy="22" r="20" fill="none" stroke="${tc}" stroke-width="3.5" stroke-dasharray="${cirDash.toFixed(1)} ${circC.toFixed(1)}" stroke-linecap="round" id="boss-ring"/>
+          </svg>
+          <div class="timer-num" id="boss-t" style="color:${tc};">${G.bTime}</div>
+        </div>
+        ${G.bSpecial?`<div style="color:#ef4444;font-size:.75rem;font-weight:900;margin-right:8px;animation:pulseRed 1s ease infinite;">⚠️ DARK MAGIC!</div>`:''}
+      </div>
+      <div class="q-card${G.isGolden?' golden':''}">
+        <div class="q-emoji" style="font-size:2.5rem;">${w.e}</div>
+        <div class="q-he" style="font-size:1.5rem;">${w.he}</div>
+        ${G.isGolden?`<div class="gold-badge">✨ מילת זהב! x5 💎</div>`:''}
+      </div>
+      <div class="opts-grid">
+        ${opts.map(o=>`<button class="opt" dir="ltr" data-correct="${o===w.en}" onclick="checkBoss('${o.replace(/'/g,"\\'")}','${w.en.replace(/'/g,"\\'")}',${G.bCur})">${o}</button>`).join('')}
+      </div>
+      ${renderPotionBar()}
+    </div>`;
+    
+  if(G.bSpecial&&G.bSpecialTurns>0){
+    if(_shuffleTick)clearInterval(_shuffleTick);
+    _shuffleTick=setInterval(()=>{
+      const grid=document.querySelector('.opts-grid');
+      if(!grid)return;
+      const btns=[...grid.children];
+      shuf(btns).forEach(b=>grid.appendChild(b));
+    },1400);
+  }
+}
+
+function startBossTick(){
+  _bsTick=setInterval(()=>{
+    if(G.bPaused) return;
+    G.bTime--;
+    const tc=G.bTime<=3?'#ef4444':G.bTime<=5?'#f7b731':'#26de81';
+    const et=document.getElementById('boss-t');if(et){et.textContent=G.bTime;et.style.color=tc;}
+    const ring=document.getElementById('boss-ring');
+    if(ring){const tot=getBossTimerDur(),c=2*Math.PI*20;ring.setAttribute('stroke-dasharray',`${(c*G.bTime/tot).toFixed(1)} ${c.toFixed(1)}`);ring.setAttribute('stroke',tc);}
+    if(G.bTime<=0){
+        clearInterval(_bsTick);_bsTick=null;if(_shuffleTick){clearInterval(_shuffleTick);_shuffleTick=null;}
+        onWrong(null);
+        if(G.hearts>0) { nextBossTurn(); startBossTick(); }
     }
+  },1000);
+}
 
-    async function saveData() {
-      globalHighScore = Math.max(globalHighScore, globalScore);
-      updateUI();
-      saveLocal();
-
-      if (!userId || !db) return;
-      try {
-        await setDoc(doc(db, `artifacts/${appId}/users/${userId}/demon_hunter_progress/data`), {
-          progress: playerProgress,
-          highScore: globalHighScore,
-          currentScore: globalScore
-        }, { merge: true });
-      } catch (e) { console.error("Save failed", e); }
-    }
-
-    function updateUI() {
-      elements.score.textContent = globalScore;
-      elements.highScore.textContent = globalHighScore;
-      elements.relicsCount.textContent = relicsTotal();
-      elements.hardModeInd.textContent = playerProgress.hardMode ? "דולק" : "כבוי";
-      window.AdventureGame.renderMap();
-    }
-
-    // -----------------------------
-    // GAME ENGINE
-    // -----------------------------
-    window.AdventureGame = {
-      showView: (name) => {
-        Object.values(views).forEach(v => v.classList.add('hidden'));
-        document.getElementById(name).classList.remove('hidden');
-      },
-
-      toggleHardMode: () => {
-        playerProgress.hardMode = !playerProgress.hardMode;
-        updateUI();
-        saveData();
-      },
-
-      resetLocal: () => resetLocal(),
-
-      renderMap: () => {
-        const allStages = flattenStages();
-        elements.worldsList.innerHTML = "";
-
-        WORLDS.forEach(world => {
-          const wrap = document.createElement('div');
-          wrap.className = "bg-gray-800/60 border border-gray-700 rounded-2xl p-4";
-
-          const head = document.createElement('div');
-          head.className = "flex items-center justify-between mb-3";
-          head.innerHTML = `
-            <div class="flex items-center gap-3">
-              <div class="text-3xl">${world.icon}</div>
-              <div>
-                <div class="text-xl font-black text-white">${world.title}</div>
-                <div class="text-sm text-gray-400">${world.tagline}</div>
-              </div>
-            </div>
-            <div class="text-xs text-gray-400">שלבים: ${world.stages.length}</div>
-          `;
-
-          const grid = document.createElement('div');
-          grid.className = "grid grid-cols-1 md:grid-cols-2 gap-3";
-
-          world.stages.forEach(stage => {
-            const isDone = !!playerProgress.completedStages[stage.stageId];
-            const isCurrent = stage.stageId === playerProgress.currentStageId;
-            const isLocked = stage.stageId > playerProgress.currentStageId;
-
-            const div = document.createElement('div');
-            
-            const statusClass = isDone 
-              ? "border-emerald-500 bg-gray-900/40" 
-              : (isCurrent ? "border-pink-500 bg-gray-900 ring-2 ring-pink-500/30" : "border-gray-700 bg-gray-900/30 opacity-70");
-            
-            const lockClass = isLocked ? "stage-locked" : "";
-            const typeTag = formatStageType(stage.challengeType);
-            const rewardTag = stage.reward?.relic ? `Relic: ${stage.reward.relicName || "כן"}` : `+${stage.reward?.souls || 0} נשמות`;
-
-            div.className = `p-4 rounded-2xl border-2 transition relative overflow-hidden ${statusClass} ${lockClass}`;
-            div.innerHTML = `
-              <div class="flex justify-between items-start relative z-10">
-                <div>
-                  <div class="text-lg font-bold text-white">${stage.title}</div>
-                  <div class="text-xs text-gray-400 mt-1">שלב ${stage.stageId} - ${typeTag}</div>
-                </div>
-                <div class="text-2xl">${isDone ? "✅" : (isLocked ? "🔒" : "🔥")}</div>
-              </div>
-              <div class="mt-3 flex items-center gap-2 text-xs">
-                <span class="px-2 py-1 rounded-full bg-gray-800 border border-gray-700 text-gray-300">${rewardTag}</span>
-                ${stage.boss ? `<span class="px-2 py-1 rounded-full bg-purple-900/40 border border-purple-600 text-purple-200">בוס</span>` : ""}
-              </div>
-            `;
-
-            if (!isLocked) div.onclick = () => AdventureGame.prepStage(stage);
-            grid.appendChild(div);
-          });
-
-          wrap.appendChild(head);
-          wrap.appendChild(grid);
-          elements.worldsList.appendChild(wrap);
-        });
-      },
-
-      prepStage: (stage) => {
-        currentStageData = stage;
+function checkBoss(chosen,correct,idx){
+  if(G.bAns||G.bPaused)return; G.bAns=true;
+  clearTimers(); if(_shuffleTick)clearInterval(_shuffleTick);
+  const w=G.bQueue[G.bCur%G.bQueue.length];
+  
+  if(chosen===correct){
+    const pE = document.getElementById('player-emoji');
+    if(pE) { pE.classList.add('pDash'); setTimeout(()=>pE.classList.remove('pDash'), 300); }
+    
+    shootProjectile('player-emoji', 'boss-emoji', '✨');
+    
+    setTimeout(() => {
+        const prevHp=G.bHp;G.bHp=Math.max(0,G.bHp-1);
+        onCorrect(w);
+        dmgNum(`💥 -1 HP`,true,65,35);
+        const fill=document.getElementById('boss-hp-fill');
+        if(fill)fill.style.width=(G.bHp/G.bMaxHp*100)+'%';
         
-        elements.stageTitle.textContent = stage.title;
-        elements.stageMeta.textContent = `שלב ${stage.stageId} - ${formatStageType(stage.challengeType)}${stage.boss ? " - בוס" : ""}`;
-        elements.stageNarrative.textContent = stage.narrative;
-        elements.stageImg.src = stage.characterImage;
-        
-        const ins = {
-          match: "התאימי בין מילים באנגלית לבין התרגום.",
-          flashcards: "שינון: הפכי כרטיסיות והשמיעי את המילה.",
-          quiz: "עני על שאלות - בחרי את התשובה הנכונה.",
-          typing: "השלימי את המילה החסרה באנגלית.",
-          listening: "הקשיבי ובחרי את המילה ששמעת.",
-          dialogue: "בחרי תגובה נכונה בשיחה.",
-          boss: "קרב רב-שלבי - תנצחי כל פאזה."
-        }[stage.challengeType] || "משימה";
-
-        elements.instructions.textContent = ins;
-        elements.tip.textContent = stage.tip || "";
-        
-        const souls = stage.reward?.souls || 0;
-        elements.rewardText.textContent = stage.reward?.relic 
-          ? `+${souls} נשמות + Relic` 
-          : `+${souls} נשמות`;
-        
-        elements.riskText.textContent = stage.risk || "אין";
-        elements.relicBonusText.textContent = `בונוס צבירה: +${Math.round((relicBonusMultiplier() - 1) * 100)}% לניקוד`;
-
-        AdventureGame.showView('stage-challenge-view');
-      },
-
-      startChallenge: () => {
-        elements.gameTitle.textContent = currentStageData.title;
-        elements.gameSubtitle.textContent = `סוג: ${formatStageType(currentStageData.challengeType)}${playerProgress.hardMode ? " - מצב קשה" : ""}`;
-
-        elements.gameContent.innerHTML = "";
-        elements.feedback.textContent = "";
-        elements.nextBtn.classList.add('hidden');
-        elements.endQuizBtn.classList.add('hidden');
-
-        // Boss bar default
-        elements.bossBar.classList.add('hidden');
-        elements.bossName.textContent = "";
-        elements.bossPhase.textContent = "";
-        elements.bossHp.style.width = "100%";
-
-        AdventureGame.showView('game-view');
-
-        const type = currentStageData.challengeType;
-        const data = currentStageData.unitData;
-
-        if (type === "match") window.GameMatch.init(data.vocabulary);
-        else if (type === "flashcards") window.GameFlashcards.init(data.vocabulary);
-        else if (type === "quiz") window.GameQuiz.init(data.quiz);
-        else if (type === "typing") window.GameTyping.init(data.typing);
-        else if (type === "listening") window.GameListening.init(data.listening);
-        else if (type === "dialogue") window.GameDialogue.init(data.dialogue);
-        else if (type === "boss") window.GameBoss.init(data.boss, currentStageData.boss);
-      },
-
-      completeStage: () => {
-        const stage = currentStageData;
-        const id = stage.stageId;
-
-        const already = !!playerProgress.completedStages[id];
-        if (!already) {
-          playerProgress.completedStages[id] = true;
-          playerProgress.currentStageId = id + 1;
-          
-          // award souls + relic
-          const baseSouls = stage.reward?.souls || 0;
-          const souls = Math.round(baseSouls * relicBonusMultiplier());
-          globalScore += souls;
-
-          awardRelicIfAny(stage);
-          
-          elements.feedback.textContent = stage.successMessage || "השלב הושלם!";
-          elements.feedback.className = "text-2xl font-bold text-green-400 animate-bounce";
-
-          saveData();
-        } else {
-          elements.feedback.textContent = "שלב הושלם שוב! (ללא פרס שלב)";
-          elements.feedback.className = "text-xl font-bold text-gray-400";
-          saveData();
+        if(G.bHp<=0){ killBoss(); return; }
+        if(!checkPhaseTransitions(prevHp)){
+            nextBossTurn();
         }
+    }, 350);
+  } else {
+    const bE = document.getElementById('boss-emoji');
+    if(bE) { bE.classList.add('bDash'); setTimeout(()=>bE.classList.remove('bDash'), 300); }
+    
+    shootProjectile('boss-emoji', 'player-emoji', '🔥');
+    
+    setTimeout(() => {
+        onWrong(w);
+        dmgNum('😵',false,35,35);
+        G.bTaunt=getBossTaunt();
+        const dlg=document.getElementById('boss-dialogue');if(dlg)dlg.textContent=`"${G.bTaunt}"`;
+        if(G.hearts<=0) return;
+        nextBossTurn();
+    }, 350);
+  }
+}
 
-        setTimeout(() => {
-          AdventureGame.showView('map-view');
-        }, 2200);
-      },
+function nextBossTurn() {
+  G.bCur++; G.bAns=false; G.bTime=getBossTimerDur(); G.bTaunt=getBossTaunt();
+  setTimeout(()=>{ if(!G.bPaused){renderBoss();startBossTick();} }, 780);
+}
 
-      addScore: (pts) => {
-        const p = Math.round(pts * relicBonusMultiplier());
-        globalScore += p;
-        elements.score.textContent = globalScore;
-        saveLocal();
-      },
+function checkPhaseTransitions(prevHp) {
+  const oldPhase = getBossPhaseFrom(prevHp);
+  const newPhase = getBossPhaseFrom(G.bHp);
+  
+  if(!G.bHitSpecial && prevHp>Math.floor(G.bMaxHp/2) && G.bHp<=Math.floor(G.bMaxHp/2)){
+     G.bHitSpecial=true; triggerBossSpecial(); return true; 
+  }
+  
+  if(oldPhase !== newPhase) {
+      triggerBossPhaseChange(newPhase);
+      return true;
+  }
+  return false;
+}
 
-      damageBoss: (amount, bossState) => {
-        bossState.hp = Math.max(0, bossState.hp - amount);
-        const pct = Math.max(0, Math.min(100, Math.round((bossState.hp / bossState.maxHp) * 100)));
-        elements.bossHp.style.width = `${pct}%`;
-      },
+function getBossPhaseFrom(hp) {
+   const r = hp/G.bMaxHp;
+   return r>0.66 ? 'normal' : r>0.33 ? 'angry' : 'enraged';
+}
 
-      setBossUI: (name, phase, bossState) => {
-        elements.bossBar.classList.remove('hidden');
-        elements.bossName.textContent = `👑 ${name}`;
-        elements.bossPhase.textContent = `שלב ${phase} מתוך ${bossState.phases}`;
-      }
-    };
+function killBoss() {
+  const be=document.getElementById('boss-emoji');if(be)be.classList.add('dead');
+  confetti({particleCount:150,spread:100,origin:{y:.5},colors:['#ff6b6b','#f59e0b','#a55eea']});
+  setTimeout(()=>showChestOpening(),900);
+}
 
-    // -----------------------------
-    // GAME: MATCH
-    // -----------------------------
-    window.GameMatch = {
-      selected: [],
-      remaining: 0,
+function triggerBossSpecial(){
+  G.bPaused = true;
+  G.bSpecial=true;G.bSpecialTurns=3;
+  const d=document.createElement('div');d.className='special-warning';
+  d.innerHTML=`<div class="ff" style="font-size:2.2rem;color:#ef4444;text-shadow:0 0 30px #ef4444;background:rgba(0,0,0,.9);padding:24px 32px;border-radius:24px;border:3px solid #ef4444;text-align:center;">⚠️ DARK MAGIC! ⚠️<br><span style="font-size:1.1rem;font-weight:700;">התשובות עומדות להתערבב!</span></div>`;
+  document.body.appendChild(d);shake(true);
+  toast('👹 הבוס מפעיל כוח חשוך! התשובות מתערבבות!',2500);
+  
+  setTimeout(()=>{
+     d.remove();
+     G.bPaused = false;
+     nextBossTurn();
+  }, 2500);
+}
 
-      init: (vocab) => {
-        const grid = document.createElement('div');
-        grid.className = 'grid grid-cols-2 gap-4 w-full max-w-lg';
+function triggerBossPhaseChange(phase){
+  G.bPaused = true;
+  const msg = phase === 'enraged' ? '🔥 ENRAGED!!! 🔥' : '💢 ANGRY! 💢';
+  const col = phase === 'enraged' ? '#ef4444' : '#f59e0b';
+  const d = document.createElement('div');
+  d.style.cssText = `position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);animation:fadeUp 0.3s ease;`;
+  d.innerHTML = `<div class="ff" style="font-size:3.5rem;color:${col};text-shadow:0 0 40px ${col};animation:pop 0.5s ease infinite;">${msg}</div>`;
+  document.body.appendChild(d);
+  shake(true);
+  
+  setTimeout(()=>{
+     d.remove();
+     G.bPaused = false;
+     nextBossTurn();
+  }, 2000);
+}
 
-        let cards = [];
-        const take = Math.min(6, vocab.length);
-        const chosen = vocab.slice(0, take);
 
-        chosen.forEach(w => {
-          cards.push({ id: w.id, text: w.en, type: 'en' });
-          cards.push({ id: w.id, text: w.he, type: 'he' });
-        });
-
-        cards.sort(() => Math.random() - 0.5);
-
-        cards.forEach(c => {
-          const el = document.createElement('div');
-          el.className = 'game-card bg-gray-800 p-4 rounded-xl text-center text-lg font-bold text-white select-none';
-          el.textContent = c.text;
-          el.onclick = () => window.GameMatch.click(el, c);
-          grid.appendChild(el);
-        });
-
-        elements.gameContent.appendChild(grid);
-        window.GameMatch.remaining = chosen.length;
-        window.GameMatch.selected = [];
-      },
-
-      click: (el, data) => {
-        if (el.classList.contains('invisible')) return;
-        
-        if (el.classList.contains('selected')) {
-          el.classList.remove('selected');
-          window.GameMatch.selected = window.GameMatch.selected.filter(i => i.el !== el);
-          return;
-        }
-
-        el.classList.add('selected');
-        window.GameMatch.selected.push({ el, data });
-
-        if (window.GameMatch.selected.length === 2) window.GameMatch.check();
-      },
-
-      check: () => {
-        const [a, b] = window.GameMatch.selected;
-        const penalty = playerProgress.hardMode ? -12 : -6;
-
-        if (a.data.id === b.data.id && a.data.type !== b.data.type) {
-          a.el.classList.add('correct-match');
-          b.el.classList.add('correct-match');
-          AdventureGame.addScore(playerProgress.hardMode ? 28 : 20);
-          
-          setTimeout(() => {
-            a.el.classList.add('invisible');
-            b.el.classList.add('invisible');
-            window.GameMatch.remaining--;
-            if (window.GameMatch.remaining === 0) AdventureGame.completeStage();
-          }, 450);
-        } else {
-          a.el.classList.add('incorrect-match');
-          b.el.classList.add('incorrect-match');
-          AdventureGame.addScore(penalty);
-          
-          setTimeout(() => {
-            a.el.classList.remove('incorrect-match', 'selected');
-            b.el.classList.remove('incorrect-match', 'selected');
-          }, 450);
-        }
-
-        window.GameMatch.selected = [];
-      }
-    };
-
-    // -----------------------------
-    // GAME: FLASHCARDS
-    // -----------------------------
-    window.GameFlashcards = {
-      list: [], idx: 0, 
-
-      init: (vocab) => {
-        window.GameFlashcards.list = vocab;
-        window.GameFlashcards.idx = 0;
-        window.GameFlashcards.render();
-      },
-
-      render: () => {
-        if (window.GameFlashcards.idx >= window.GameFlashcards.list.length) {
-          AdventureGame.completeStage();
-          return;
-        }
-
-        const w = window.GameFlashcards.list[window.GameFlashcards.idx];
-
-        elements.gameContent.innerHTML = `
-          <div class="w-full max-w-sm h-64 cursor-pointer" onclick="this.firstElementChild.classList.toggle('rotate-y-180')">
-            <div class="relative w-full h-full transition-transform duration-700 transform-style-3d">
-              <div class="absolute inset-0 bg-gradient-to-br from-pink-600 to-purple-800 rounded-2xl flex items-center justify-center backface-hidden shadow-xl border-2 border-pink-400">
-                <div class="text-center">
-                  <h3 class="text-4xl font-bold text-white">${w.en}</h3>
-                  <p class="mt-2 text-xs text-pink-200">לחצי להפוך</p>
-                </div>
-              </div>
-              <div class="absolute inset-0 bg-gray-800 rounded-2xl flex items-center justify-center backface-hidden rotate-y-180 border-2 border-purple-500">
-                <h3 class="text-3xl font-bold text-white">${w.he}</h3>
-              </div>
-            </div>
+/* ═══════════════════════════════════════
+   CHEST OPENING
+═══════════════════════════════════════ */
+function showChestOpening(){
+  clearTimers();
+  const w=G.w;
+  const gemReward=G.w.levels[3].id===G.lId?150:80;
+  document.getElementById('app').innerHTML=`<div class="screen" style="background:radial-gradient(ellipse at 50% 30%,${w.c}30 0%,#08081a 60%);">
+    <div class="chest-wrap">
+      <div class="ff" style="font-size:1.8rem;color:#f59e0b;margin-bottom:6px;text-shadow:0 2px 10px rgba(245,158,11,0.5);">🎉 ניצחת!</div>
+      <div class="ff" style="font-size:1.2rem;color:rgba(255,255,255,.8);margin-bottom:32px;">${w.bossName} הובס סופית!</div>
+      <div id="chest-em" class="chest-emoji" onclick="openChest(${gemReward})">🎁</div>
+      <div class="ff" style="margin-top:24px;font-size:1rem;color:rgba(255,255,255,.6);">הקישי על הארגז כדי לפתוח!</div>
+    </div>
+  </div>`;
+}
+function openChest(gemReward){
+  if(document.getElementById('chest-em').classList.contains('open'))return;
+  
+  const el=document.getElementById('chest-em');
+  el.style.animation = 'screenShake 0.1s linear infinite';
+  
+  setTimeout(() => {
+      el.style.animation = '';
+      el.textContent='📦';el.classList.add('open');
+      confetti({particleCount:250,spread:120,origin:{y:.55},colors:['#f59e0b','#fbbf24','#a55eea','#ff6b6b','#4ecdc4']});
+      addGems(gemReward);ST.gems+=gemReward;saveST();shake(false);
+      
+      setTimeout(()=>{
+        document.getElementById('app').innerHTML+=`<div style="text-align:center;padding:0 20px;animation:cardReveal .5s ease both;">
+          <div style="--cr:-5deg;" class="card-reveal" style="display:inline-flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.05));border:2px solid #f59e0b;border-radius:24px;padding:20px 32px;margin:10px auto;box-shadow:0 10px 40px rgba(245,158,11,0.4);">
+            <div style="font-size:3.5rem; animation:pop 0.5s ease;">💎</div>
+            <div class="ff" style="font-size:2.4rem;color:#f59e0b;text-shadow:0 2px 10px rgba(245,158,11,0.5);">+${gemReward}</div>
+            <div style="color:rgba(255,255,255,.8);font-size:1rem;font-weight:800;">יהלומים!</div>
           </div>
-          
-          <div class="flex gap-3 mt-6">
-            <button onclick="window.speakEnglish('${w.en}')" class="px-6 py-2 bg-gray-700 rounded-full hover:bg-gray-600">🔊 השמעה</button>
-            <button onclick="window.GameFlashcards.next()" class="px-6 py-2 bg-green-600 rounded-full hover:bg-green-500 font-bold">הבא ➔</button>
-          </div>
-        `;
-      },
+          <br>
+          <button class="btn btn-primary" style="margin-top:16px; transform: scale(1.1);" onclick="finishLevel()">המשך למסע ➜</button>
+        </div>`;
+      }, 800);
+  }, 1000); 
+}
 
-      next: () => {
-        window.GameFlashcards.idx++;
-        AdventureGame.addScore(playerProgress.hardMode ? 14 : 10);
-        window.GameFlashcards.render();
-      }
-    };
+/* ═══════════════════════════════════════
+   FINISH LEVEL
+═══════════════════════════════════════ */
+function finishLevel(){
+  clearTimers();
+  const stars=G.hearts>=G.maxH?3:G.hearts>=2?2:G.hearts>=1?1:1;
+  const old=getLD(G.lId);ST.levels[G.lId]={stars:Math.max(old.stars,stars),done:true};
+  ST.potions={...G.potions};
+  if(G.l.type==='quiz'&&G.wrong===0)grantAch('perfect');
+  if(G.l.type==='speed'&&G.spCorrect>=10)grantAch('speed10');
+  if(ST.charId==='maya'&&G.l.type==='boss'){ST.hp=Math.min(ST.maxHp,ST.hp+20);saveST();}
+  addXP(35);checkAch();saveST();
+  if(WORLDS.every(w=>w.levels.every(l=>getLD(l.id).done)))confetti({particleCount:200,spread:120,origin:{y:.4}});
+  showResult(stars);
+}
 
-    // -----------------------------
-    // GAME: QUIZ
-    // -----------------------------
-    window.GameQuiz = {
-      list: [], idx: 0, corrects: 0,
+function showResult(stars){
+  const w=G.w,isBoss=G.l.type==='boss';
+  if(stars>=3)confetti({particleCount:130,spread:90,origin:{y:.55},colors:['#f59e0b','#fbbf24','#26de81']});
+  document.getElementById('app').innerHTML=`<div class="screen" style="background:radial-gradient(ellipse at 50% 0%,${w.c}25 0%,#08081a 55%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div class="result-card">
+      <div style="text-align:center;margin-bottom:12px;font-size:${isBoss?'3.8rem':'3rem'}">${isBoss&&stars>=2?'🏆':stars===3?'🌟':stars===2?'🎉':'💪'}</div>
+      <h2 class="ff" style="text-align:center;font-size:1.7rem;color:${isBoss?'#ef4444':'#1e293b'};margin-bottom:4px;">${isBoss&&stars>=2?'בוס הובס! 👑':stars===3?'מושלם! ⭐⭐⭐':'כל הכבוד!'}</h2>
+      <p style="text-align:center;color:#6b7280;font-size:.8rem;font-weight:700;margin-bottom:16px;">${w.title} · ${G.l.title}</p>
+      <div style="display:flex;justify-content:center;gap:8px;margin-bottom:18px;font-size:2.5rem;">${[1,2,3].map(k=>k<=stars?'⭐':'<span style="opacity:.15">⭐</span>').join('')}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+        ${[['💎','+'+G.gems,'יהלומים'],['✅',G.correct,'נכון'],['🔥',G.combo>0?G.combo:ST.comboRecord,'קומבו']].map(([e,v,t])=>`<div style="background:#f8fafc;border-radius:14px;padding:12px;text-align:center;"><div style="font-size:1.1rem;">${e}</div><div class="ff" style="font-size:1.4rem;color:#1e293b;">${v}</div><div style="color:#6b7280;font-size:.7rem;font-weight:700;">${t}</div></div>`).join('')}
+      </div>
+      ${G.wrongWords.length?`<div style="background:#fff7ed;border-radius:16px;padding:12px;margin-bottom:12px;border-right:4px solid #f59e0b;">
+        <p style="color:#92400e;font-size:.75rem;font-weight:800;margin-bottom:6px;">📌 לחזור על:</p>
+        ${[...new Set(G.wrongWords.map(v=>v.en))].slice(0,5).map(en=>{const v=VOCAB.find(x=>x.en===en);return v?`<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:3px 0;"><span dir="ltr" style="font-weight:800;">${v.en}</span><span style="color:#6b7280;font-weight:600;">${v.he}</span></div>`:''}).join('')}
+      </div>`:''}
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <button class="btn btn-primary" style="width:100%;" onclick="startLevel(${G.wId},'${G.lId}')">🔄 שוב</button>
+        <button class="btn btn-ghost" style="width:100%;border-color:#6366f1;color:#6366f1;background:#eef2ff;" onclick="go('world',${G.wId})">🗺️ חזרה לעולם</button>
+        <button onclick="go('map')" style="background:none;border:none;color:#9ca3af;font-family:'Heebo',sans-serif;font-weight:700;cursor:pointer;padding:8px;font-size:.85rem;">🏠 מפה ראשית</button>
+      </div>
+    </div>
+  </div>`;
+}
 
-      init: (quiz) => {
-        window.GameQuiz.list = quiz;
-        window.GameQuiz.idx = 0;
-        window.GameQuiz.corrects = 0;
-        window.GameQuiz.render();
-      },
+/* ═══════════════════════════════════════
+   FAIL SCREEN
+═══════════════════════════════════════ */
+function showFailed(){
+  clearTimers();
+  document.getElementById('app').innerHTML=`<div class="screen" style="background:radial-gradient(ellipse at 50% 30%,#2a0505 0%,#08081a 60%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="text-align:center;max-width:320px;">
+      <div style="font-size:5rem;margin-bottom:14px;animation:float 2s ease infinite;">💔</div>
+      <h2 class="ff" style="font-size:2rem;color:#ef4444;margin-bottom:8px;">אין לבבות!</h2>
+      <p style="color:rgba(255,255,255,.55);font-weight:700;margin-bottom:20px;">אל תוותר/י! נסה/י שוב!</p>
+      ${G.wrongWords.length?`<div style="background:rgba(255,255,255,.06);border-radius:18px;padding:14px;margin-bottom:20px;text-align:right;">
+        <p style="color:rgba(255,255,255,.4);font-size:.75rem;font-weight:700;margin-bottom:7px;">📌 מילים לחזרה:</p>
+        ${[...new Set(G.wrongWords.map(v=>v.en))].slice(0,5).map(en=>{const v=VOCAB.find(x=>x.en===en);return v?`<div style="display:flex;justify-content:space-between;font-size:.83rem;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span dir="ltr" style="font-weight:800;color:#a78bfa;">${v.en}</span><span style="color:rgba(255,255,255,.5);font-weight:600;">${v.he}</span></div>`:''}).join('')}
+      </div>`:''}
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="btn btn-danger" style="width:100%;" onclick="startLevel(${G.wId},'${G.lId}')">🔄 שוב!</button>
+        ${ST.gems>=90?`<button class="btn" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:13px 28px;font-size:1rem;width:100%;box-shadow:0 4px 16px rgba(245,158,11,.4);" onclick="revive()">💎 90 — קני לב נוסף!</button>`:''}
+        <button class="btn btn-ghost" style="width:100%;" onclick="go('world',${G.wId})">← חזרה</button>
+      </div>
+    </div>
+  </div>`;
+}
+function revive(){if(ST.gems<90)return;ST.gems-=90;saveST();toast('❤️ קיבלת לב נוסף!');startLevel(G.wId,G.lId);}
 
-      render: () => {
-        if (window.GameQuiz.idx >= window.GameQuiz.list.length) {
-          elements.gameContent.innerHTML = `
-            <div class="w-full max-w-lg bg-gray-800 p-6 rounded-2xl border border-gray-700 text-center">
-              <h3 class="text-3xl font-bold text-white mb-2">המבחן הסתיים!</h3>
-              <p class="text-gray-300">תשובות נכונות: <span class="font-black text-emerald-300">${window.GameQuiz.corrects}</span> מתוך ${window.GameQuiz.list.length}</p>
-              <p class="text-xs text-gray-400 mt-3">לחצי לסיום כדי לאשר ניצחון בשלב.</p>
-            </div>
-          `;
-          elements.endQuizBtn.classList.remove('hidden');
-          return;
-        }
+/* ═══════════════════════════════════════
+   SHOP
+═══════════════════════════════════════ */
+function renderShop(){
+  const items=[
+    {e:'💡',name:'רמז',desc:'מסיר 2 תשובות שגויות',price:60,key:'hint'},
+    {e:'🛡️',name:'מגן',desc:'טעות אחת לא מורידה לב',price:90,key:'shield'},
+    {e:'⚡',name:'SUPER טעינה',desc:'מוסיף 2 תאי כוח ל-SUPER BAR',price:40,key:'super_charge'},
+  ];
+  return `<div class="screen" style="background:radial-gradient(ellipse at 50% 0%,#0d1a0d 0%,#08081a 60%);min-height:100vh;padding-bottom:32px;">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px;background:rgba(0,0,0,.5);border-bottom:1px solid rgba(255,255,255,.07);">
+      <button class="btn-back" onclick="go('map')">←</button>
+      <h1 class="ff" style="font-size:1.6rem;">🛒 חנות</h1>
+      <div style="margin-right:auto;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);border-radius:50px;padding:5px 14px;font-weight:900;color:#f59e0b;font-size:.9rem;">💎 ${ST.gems}</div>
+    </div>
+    <div style="padding:18px 14px 0;">
+      <p style="color:rgba(255,255,255,.4);font-size:.8rem;font-weight:700;margin-bottom:14px;">קני פריטים שיעזרו לך בקרב!</p>
+      ${items.map(it=>`<div class="shop-item">
+        <div style="width:50px;height:50px;border-radius:16px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;">${it.e}</div>
+        <div style="flex:1;"><div style="font-weight:900;">${it.name}</div><div style="color:rgba(255,255,255,.45);font-size:.75rem;font-weight:700;">${it.desc}</div>${it.key!=='super_charge'?`<div style="color:rgba(255,255,255,.3);font-size:.7rem;">במלאי: ${ST.potions[it.key]||0}</div>`:''}</div>
+        <button class="btn btn-primary" style="padding:10px 18px;font-size:.88rem;" onclick="buyItem('${it.key}',${it.price})" ${ST.gems<it.price?'disabled style="opacity:.4"':''}>💎 ${it.price}</button>
+      </div>`).join('')}
+      <div style="background:rgba(255,255,255,.04);border-radius:20px;padding:16px;margin-top:16px;border:1px solid rgba(255,255,255,.07);">
+        <div class="ff" style="margin-bottom:8px;color:#f59e0b;">💡 איך להרוויח יהלומים?</div>
+        <div style="color:rgba(255,255,255,.45);font-size:.8rem;font-weight:700;line-height:1.7;">✅ תשובה נכונה = +10 💎<br>🔥 קומבו x3 = +20 💎<br>🌊 קומבו x10 = +40 💎<br>✨ מילת זהב = +50 💎<br>👑 ניצחון בוס = +150 💎</div>
+      </div>
+    </div>
+  </div>`;
+}
+function buyItem(key,price){
+  if(ST.gems<price){toast('אין מספיק יהלומים!');return;}
+  ST.gems-=price;
+  if(key==='super_charge'){G.powerBar=Math.min(5,(G.powerBar||0)+2);toast('⚡ SUPER BAR נטען!');}
+  else{ST.potions[key]=(ST.potions[key]||0)+1;toast(`${key==='hint'?'💡':'🛡️'} נוסף למלאי!`);}
+  saveST();go('shop');
+}
 
-        const q = window.GameQuiz.list[window.GameQuiz.idx];
-        const opts = [...q.options].sort(() => Math.random() - 0.5);
+/* ═══════════════════════════════════════
+   PROFILE
+═══════════════════════════════════════ */
+function renderProfile(){
+  const ch=getChar();
+  const done=Object.values(ST.levels).filter(l=>l.done).length;
+  const bossWins=WORLDS.filter(w=>getLD(w.levels[3].id).done).length;
+  return `<div class="screen" style="background:radial-gradient(ellipse at 50% 0%,${ch.c}18 0%,#08081a 55%);min-height:100vh;padding-bottom:32px;">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px;background:rgba(0,0,0,.5);border-bottom:1px solid rgba(255,255,255,.07);">
+      <button class="btn-back" onclick="go('map')">←</button>
+      <h1 class="ff" style="font-size:1.6rem;">🏅 פרופיל</h1>
+    </div>
+    <div style="padding:18px 14px 0;">
+      <div style="background:linear-gradient(135deg,${ch.c}22,${ch.c}08);border:1.5px solid ${ch.c}44;border-radius:28px;padding:22px;text-align:center;margin-bottom:14px;">
+        <img src="${ch.av}" style="width:68px;height:68px;border-radius:50%;border:3px solid ${ch.c};background:rgba(255,255,255,.08);margin-bottom:10px;">
+        <div class="ff" style="font-size:1.6rem;color:${ch.c};">${ch.name}</div>
+        <div style="color:rgba(255,255,255,.45);font-size:.82rem;font-weight:700;margin-bottom:12px;">${ch.role} · רמה ${ST.lvl}</div>
+        <div class="xp-bar" style="height:10px;"><div class="xp-fill" style="width:${ST.xp/ST.xpNext*100}%;"></div></div>
+        <div style="color:rgba(255,255,255,.35);font-size:.73rem;font-weight:700;margin-top:4px;">${ST.xp}/${ST.xpNext} XP לרמה הבאה</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+        ${[['💎',ST.gems,'יהלומים'],['⭐',totalStars(),'כוכבים'],['✅',ST.totalCorrect,'נכון'],['🔥',ST.comboRecord,'שיא קומבו'],['🗺️',done,'שלבים'],['👹',bossWins,'בוסים']].map(([e,v,t])=>`<div style="background:rgba(255,255,255,.06);border-radius:16px;padding:12px;text-align:center;"><div style="font-size:1.4rem;">${e}</div><div class="ff" style="font-size:1.3rem;">${v}</div><div style="color:rgba(255,255,255,.38);font-size:.68rem;font-weight:700;">${t}</div></div>`).join('')}
+      </div>
+      <div class="ff" style="margin-bottom:10px;">🏅 הישגים (${Object.keys(ST.achievements).length}/${ACHIEV.length})</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;">
+        ${ACHIEV.map(a=>{const got=ST.achievements[a.id];return `<div style="background:${got?'rgba(245,158,11,.15)':'rgba(255,255,255,.04)'};border:1.5px solid ${got?'rgba(245,158,11,.5)':'rgba(255,255,255,.07)'};border-radius:14px;padding:10px 6px;text-align:center;${!got?'filter:grayscale(1);opacity:.35':''}">
+          <div style="font-size:1.4rem;">${a.e}</div>
+          <div style="font-size:.66rem;font-weight:800;color:${got?'#f59e0b':'rgba(255,255,255,.4)'};margin-top:3px;line-height:1.2;">${a.t}</div>
+        </div>`;}).join('')}
+      </div>
+      <button class="btn btn-ghost" style="width:100%;" onclick="if(confirm('לאפס הכל?')){localStorage.removeItem('${SK}');ST=defST();go('chars');}">🔄 אפס משחק</button>
+    </div>
+  </div>`;
+}
 
-        let html = `
-          <div class="w-full max-w-lg bg-gray-800 p-6 rounded-2xl border border-gray-700">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-sm text-purple-300">שאלה ${window.GameQuiz.idx + 1}</h3>
-              <span class="text-xs text-gray-400">${q.tip || ""}</span>
-            </div>
-            <p class="text-2xl font-bold text-white mb-6">${q.q}</p>
-            <div class="grid gap-3">
-        `;
-
-        opts.forEach(o => {
-          html += `<button onclick="window.GameQuiz.ans(this, '${o.replaceAll("'", "\\'")}', '${q.a.replaceAll("'", "\\'")}')" class="quiz-opt w-full text-right p-4 rounded-xl bg-gray-900 hover:bg-gray-700 border border-gray-600 transition">${o}</button>`;
-        });
-
-        html += `</div></div>`;
-        elements.gameContent.innerHTML = html;
-      },
-
-      ans: (el, val, correct) => {
-        const btns = document.querySelectorAll('.quiz-opt');
-        btns.forEach(b => b.disabled = true);
-
-        const good = (val === correct);
-        if (good) {
-          el.classList.add('bg-green-900', 'border-green-500');
-          window.GameQuiz.corrects++;
-          AdventureGame.addScore(playerProgress.hardMode ? 65 : 50);
-        } else {
-          el.classList.add('bg-red-900', 'border-red-500');
-          AdventureGame.addScore(playerProgress.hardMode ? -22 : -12);
-        }
-
-        setTimeout(() => {
-          window.GameQuiz.idx++;
-          window.GameQuiz.render();
-        }, playerProgress.hardMode ? 800 : 1000);
-      },
-
-      finishQuiz: () => {
-        AdventureGame.completeStage();
-      }
-    };
-
-    // -----------------------------
-    // GAME: TYPING SPELL
-    // -----------------------------
-    window.GameTyping = {
-      list: [], idx: 0, mistakes: 0,
-      init: (items) => {
-        window.GameTyping.list = items;
-        window.GameTyping.idx = 0;
-        window.GameTyping.mistakes = 0;
-        window.GameTyping.render();
-      },
-      render: () => {
-        if (window.GameTyping.idx >= window.GameTyping.list.length) {
-          AdventureGame.completeStage();
-          return;
-        }
-        const it = window.GameTyping.list[window.GameTyping.idx];
-        const hard = playerProgress.hardMode;
-
-        // Create Word Bank (unique answers)
-        const allAnswers = [...new Set(window.GameTyping.list.map(i => i.answer))].sort();
-        const bankHtml = `
-          <div class="mb-6 bg-gray-900/50 p-3 rounded-xl border border-gray-700">
-            <div class="text-xs text-gray-400 mb-2 text-center">מחסן מילים (Word Bank)</div>
-            <div class="flex flex-wrap justify-center gap-2">
-              ${allAnswers.map(w => `<span class="px-3 py-1 bg-gray-800 border border-gray-600 rounded text-pink-300 font-mono text-sm select-all cursor-pointer hover:bg-gray-700" onclick="document.getElementById('typing-input').value = '${w}'; document.getElementById('typing-input').focus();">${w}</span>`).join('')}
-            </div>
-          </div>
-        `;
-
-        elements.gameContent.innerHTML = `
-          <div class="w-full max-w-lg bg-gray-800 p-6 rounded-2xl border border-gray-700">
-            <div class="flex items-center justify-between mb-3">
-              <div class="text-sm text-purple-300">לחשים בהקלדה ${window.GameTyping.idx + 1}/${window.GameTyping.list.length}</div>
-              <div class="text-xs text-gray-400">טעויות: <span class="text-amber-300 font-bold">${window.GameTyping.mistakes}</span>${hard ? " (מקס' 2)" : ""}</div>
-            </div>
-
-            ${bankHtml}
-
-            <p class="text-2xl font-bold text-white mb-3" dir="ltr">${it.prompt}</p>
-            <p class="text-sm text-gray-400 mb-4">רמז: <span class="text-gray-200 font-bold">${it.hint || ""}</span></p>
-            <div class="flex gap-2">
-              <input id="typing-input" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white outline-none focus:border-pink-500" placeholder="הקלידי כאן..." autocomplete="off" />
-              <button id="typing-check" class="px-5 py-3 rounded-xl bg-pink-600 hover:bg-pink-500 font-bold">בדיקה</button>
-            </div>
-            <div class="flex gap-2 mt-3">
-              <button onclick="window.speakEnglish('${it.answer}')" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 text-sm">🔊 השמעה</button>
-              <button id="typing-skip" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 text-sm">רמז חזק (-נק')</button>
-            </div>
-          </div>
-        `;
-
-        const input = document.getElementById('typing-input');
-        const btn = document.getElementById('typing-check');
-        const skip = document.getElementById('typing-skip');
-
-        const check = () => {
-          const v = (input.value || "").trim().toLowerCase();
-          const ans = (it.answer || "").trim().toLowerCase();
-
-          if (v === ans) {
-            AdventureGame.addScore(playerProgress.hardMode ? 55 : 40);
-            elements.feedback.textContent = "✨ פגיעה מדויקת!";
-            elements.feedback.className = "text-2xl font-bold text-emerald-300";
-            window.GameTyping.idx++;
-            setTimeout(() => { elements.feedback.textContent = ""; window.GameTyping.render(); }, 650);
-          } else {
-            window.GameTyping.mistakes++;
-            AdventureGame.addScore(playerProgress.hardMode ? -18 : -10);
-            elements.feedback.textContent = "❌ שגוי. נסי שוב!";
-            elements.feedback.className = "text-2xl font-bold text-red-300";
-            input.classList.add("border-red-500");
-            setTimeout(() => { input.classList.remove("border-red-500"); }, 450);
-
-            if (playerProgress.hardMode && window.GameTyping.mistakes >= 2) {
-              elements.feedback.textContent = "החותם נסגר! נסי שוב בפעם אחרת.";
-              elements.feedback.className = "text-xl font-bold text-gray-300";
-              setTimeout(() => AdventureGame.showView('map-view'), 1400);
-              return;
-            }
-          }
-        };
-
-        btn.onclick = check;
-        input.addEventListener('keydown', (e) => { if (e.key === "Enter") check(); });
-
-        skip.onclick = () => {
-          AdventureGame.addScore(playerProgress.hardMode ? -28 : -18);
-          input.value = it.answer;
-          input.focus();
-        };
-
-        input.focus();
-      }
-    };
-
-    // -----------------------------
-    // GAME: LISTENING TRAP
-    // -----------------------------
-    window.GameListening = {
-      list: [], idx: 0,
-      init: (items) => {
-        window.GameListening.list = items;
-        window.GameListening.idx = 0;
-        window.GameListening.render();
-      },
-      render: () => {
-        if (window.GameListening.idx >= window.GameListening.list.length) {
-          AdventureGame.completeStage();
-          return;
-        }
-        const it = window.GameListening.list[window.GameListening.idx];
-        const opts = [...it.options].sort(() => Math.random() - 0.5);
-
-        let html = `
-          <div class="w-full max-w-lg bg-gray-800 p-6 rounded-2xl border border-gray-700 text-center">
-            <div class="flex items-center justify-between mb-3">
-              <div class="text-sm text-purple-300">האזנה ${window.GameListening.idx + 1}/${window.GameListening.list.length}</div>
-              <button onclick="window.speakEnglish('${it.word}')" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 text-sm">🔊 השמעה</button>
-            </div>
-            <p class="text-gray-300 mb-4">שמעתי מילה. מה היא?</p>
-            <div class="grid gap-3">
-        `;
-
-        opts.forEach(o => {
-          html += `<button onclick="window.GameListening.pick(this, '${o.replaceAll("'", "\\'")}', '${it.word.replaceAll("'", "\\'")}')" class="listen-opt w-full text-right p-4 rounded-xl bg-gray-900 hover:bg-gray-700 border border-gray-600 transition">${o}</button>`;
-        });
-
-        html += `</div></div>`;
-        elements.gameContent.innerHTML = html;
-
-        // auto speak once
-        setTimeout(() => window.speakEnglish(it.word), 250);
-      },
-
-      pick: (el, val, correct) => {
-        const btns = document.querySelectorAll('.listen-opt');
-        btns.forEach(b => b.disabled = true);
-
-        if (val === correct) {
-          el.classList.add('bg-green-900', 'border-green-500');
-          AdventureGame.addScore(playerProgress.hardMode ? 60 : 45);
-          elements.feedback.textContent = "👂✅ שמיעה חדה!";
-          elements.feedback.className = "text-2xl font-bold text-emerald-300";
-        } else {
-          el.classList.add('bg-red-900', 'border-red-500');
-          AdventureGame.addScore(playerProgress.hardMode ? -24 : -12);
-          elements.feedback.textContent = "👂❌ לא. נסי שוב בשלב הבא.";
-          elements.feedback.className = "text-2xl font-bold text-red-300";
-        }
-
-        setTimeout(() => {
-          elements.feedback.textContent = "";
-          window.GameListening.idx++;
-          window.GameListening.render();
-        }, playerProgress.hardMode ? 800 : 1000);
-      }
-    };
-
-    // -----------------------------
-    // GAME: DIALOGUE DUEL
-    // -----------------------------
-    window.GameDialogue = {
-      list: [], idx: 0,
-      init: (items) => {
-        window.GameDialogue.list = items;
-        window.GameDialogue.idx = 0;
-        window.GameDialogue.render();
-      },
-      render: () => {
-        if (window.GameDialogue.idx >= window.GameDialogue.list.length) {
-          AdventureGame.completeStage();
-          return;
-        }
-
-        const it = window.GameDialogue.list[window.GameDialogue.idx];
-        const opts = [...it.options].sort(() => Math.random() - 0.5);
-
-        let html = `
-          <div class="w-full max-w-lg bg-gray-800 p-6 rounded-2xl border border-gray-700">
-            <div class="flex items-center justify-between mb-3">
-              <div class="text-sm text-purple-300">דיאלוג ${window.GameDialogue.idx + 1}/${window.GameDialogue.list.length}</div>
-              <div class="text-xs text-gray-400">NPC: <span class="text-gray-200 font-bold">${it.npc || "??"}</span></div>
-            </div>
-            <div class="bg-gray-900 border border-gray-700 rounded-xl p-4 text-white mb-4">
-              <div class="text-xs text-gray-400 mb-1">הוא אומר:</div>
-              <div class="text-xl font-bold">${it.line}</div>
-            </div>
-            <div class="grid gap-3">
-        `;
-
-        opts.forEach(o => {
-          html += `<button onclick="window.GameDialogue.pick(this, ${o.correct}, '${o.text.replaceAll("'", "\\'")}')" class="dlg-opt w-full text-right p-4 rounded-xl bg-gray-900 hover:bg-gray-700 border border-gray-600 transition">${o.text}</button>`;
-        });
-
-        html += `</div></div>`;
-        elements.gameContent.innerHTML = html;
-      },
-
-      pick: (el, correct) => {
-        const btns = document.querySelectorAll('.dlg-opt');
-        btns.forEach(b => b.disabled = true);
-
-        if (correct) {
-          el.classList.add('bg-green-900', 'border-green-500');
-          AdventureGame.addScore(playerProgress.hardMode ? 70 : 50);
-          elements.feedback.textContent = "🗣️✨ תשובה מושלמת!";
-          elements.feedback.className = "text-2xl font-bold text-emerald-300";
-        } else {
-          el.classList.add('bg-red-900', 'border-red-500');
-          AdventureGame.addScore(playerProgress.hardMode ? -26 : -14);
-          elements.feedback.textContent = "🗣️❌ לא טבעי. נסי לבחור משפט מלא ונכון.";
-          elements.feedback.className = "text-2xl font-bold text-red-300";
-        }
-
-        setTimeout(() => {
-          elements.feedback.textContent = "";
-          window.GameDialogue.idx++;
-          window.GameDialogue.render();
-        }, playerProgress.hardMode ? 800 : 1000);
-      }
-    };
-
-    // -----------------------------
-    // GAME: BOSS (multi-phase)
-    // -----------------------------
-    window.GameBoss = {
-      bossData: null,
-      bossMeta: null,
-      state: null,
-      phase: 1,
-
-      init: (bossData, bossMeta) => {
-        window.GameBoss.bossData = bossData;
-        window.GameBoss.bossMeta = bossMeta || { name: "Boss", phases: 2, hp: 100 };
-        window.GameBoss.phase = 1;
-
-        window.GameBoss.state = { 
-          phases: window.GameBoss.bossMeta.phases || 2, 
-          maxHp: window.GameBoss.bossMeta.hp || 100, 
-          hp: window.GameBoss.bossMeta.hp || 100
-        };
-
-        AdventureGame.setBossUI(window.GameBoss.bossMeta.name || "Boss", window.GameBoss.phase, window.GameBoss.state);
-        window.GameBoss.runPhase();
-      },
-
-      runPhase: () => {
-        const p = window.GameBoss.phase;
-        const st = window.GameBoss.state;
-
-        AdventureGame.setBossUI(window.GameBoss.bossMeta.name || "Boss", p, st);
-
-        if (p === 1) {
-          // phase1
-          const phase1 = window.GameBoss.bossData.phase1;
-          if (phase1.type === "match") {
-            window.GameMatch.init(phase1.vocabulary);
-            
-            // Wrap Match completion for boss
-            const originalComplete = AdventureGame.completeStage;
-            AdventureGame.completeStage = () => {}; // prevent full completion
-
-            // Patch: when match remaining hits 0, phase win:
-            const checkInterval = setInterval(() => {
-              if (window.GameMatch.remaining === 0) {
-                clearInterval(checkInterval);
-                AdventureGame.completeStage = originalComplete;
-
-                AdventureGame.damageBoss(playerProgress.hardMode ? 55 : 45, st);
-                elements.feedback.textContent = "⚔️ פאזה 1 הושלמה! הבוס נחלש.";
-                elements.feedback.className = "text-2xl font-bold text-emerald-300";
-                setTimeout(() => {
-                  elements.feedback.textContent = "";
-                  window.GameBoss.phase = 2;
-                  window.GameBoss.runPhase();
-                }, 900);
-              }
-            }, 150);
-            
-            // Add extra scoring side effects already handled by GameMatch
-            return;
-          }
-
-          if (phase1.type === "dialogue") {
-            window.GameDialogue.init(phase1.dialogue);
-
-            const checkInterval = setInterval(() => {
-              if (window.GameDialogue.idx >= window.GameDialogue.list.length) {
-                clearInterval(checkInterval);
-                AdventureGame.damageBoss(playerProgress.hardMode ? 55 : 45, st);
-                elements.feedback.textContent = "⚔️ פאזה 1 הושלמה! הבוס נסדק.";
-                elements.feedback.className = "text-2xl font-bold text-emerald-300";
-                setTimeout(() => {
-                  elements.feedback.textContent = "";
-                  window.GameBoss.phase = 2;
-                  window.GameBoss.runPhase();
-                }, 900);
-              }
-            }, 200);
-            return;
-          }
-
-          if (phase1.type === "typing") {
-            window.GameTyping.init(phase1.typing);
-            const checkInterval = setInterval(() => {
-              if (window.GameTyping.idx >= window.GameTyping.list.length) {
-                clearInterval(checkInterval);
-                AdventureGame.damageBoss(playerProgress.hardMode ? 55 : 45, st);
-                elements.feedback.textContent = "⚔️ פאזה 1 הושלמה! הבוס מתערער.";
-                elements.feedback.className = "text-2xl font-bold text-emerald-300";
-                setTimeout(() => {
-                  elements.feedback.textContent = "";
-                  window.GameBoss.phase = 2;
-                  window.GameBoss.runPhase();
-                }, 900);
-              }
-            }, 200);
-            return;
-          }
-        }
-
-        // phase2: quiz by default
-        const phase2 = window.GameBoss.bossData.phase2;
-        if (phase2.type === "quiz") {
-          window.GameQuiz.init(phase2.quiz);
-
-          // Replace finish behavior: boss dies, then stage complete
-          const originalFinish = window.GameQuiz.finishQuiz;
-          window.GameQuiz.finishQuiz = () => {
-            AdventureGame.damageBoss(playerProgress.hardMode ? 75 : 65, st);
-            
-            elements.feedback.textContent = "👑 הבוס הובס! המוזיקה חוזרת!";
-            elements.feedback.className = "text-2xl font-bold text-green-400 animate-bounce";
-
-            // Restore
-            window.GameQuiz.finishQuiz = originalFinish;
-            
-            setTimeout(() => {
-              AdventureGame.completeStage();
-            }, 900);
-          };
-
-          elements.endQuizBtn.classList.remove('hidden');
-          return;
-        }
-
-        // fallback
-        elements.gameContent.innerHTML = `<div class="text-center text-gray-200">שגיאה: פאזה לא נתמכת.</div>`;
-      }
-    };
-
-    // -----------------------------
-    // TTS
-    // -----------------------------
-    window.speakEnglish = async function(text) {
-      try {
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'en-US';
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(u);
-      } catch {}
-    };
-
-    // -----------------------------
-    // RUN
-    // -----------------------------
-    window.addEventListener('load', initApp);
-
-  </script>
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+loadST();updateStreak();
+go(!ST.charId?'chars':'map');
+</script>
 </body>
 </html>
