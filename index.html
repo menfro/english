@@ -1268,8 +1268,14 @@ function renderProfile(){
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
-loadST();updateStreak();
-go(!ST.charId?'chars':'map');
+loadST();
+// הוספת בדיקה - האם כבר יש דמות שמורה?
+if (ST.charId) {
+    updateStreak();
+    go('map');
+} else {
+    go('chars');
+}
 </script>
 </body>
 </html>
