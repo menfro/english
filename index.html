@@ -130,12 +130,6 @@ body{font-family:'Heebo',sans-serif;direction:rtl;background:#08081a;color:#fff;
 .special-warning{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;animation:specialWarning .5s ease infinite;pointer-events:none;}
 .enrage-tint{position:fixed;inset:0;background:rgba(239,68,68,.06);z-index:1;pointer-events:none;animation:pulseRed 1.5s ease infinite;}
 
-/* ── TIMER RING ──────────────────── */
-.timer-ring-wrap{display:flex;align-items:center;justify-content:center;margin:2px 0 6px;}
-.timer-ring{width:54px;height:54px;position:relative;display:inline-flex;align-items:center;justify-content:center;}
-.timer-ring svg{position:absolute;inset:0;transform:rotate(-90deg);}
-.timer-num{font-family:'Fredoka One',cursive;font-size:1.2rem;position:relative;z-index:1;}
-
 /* ── PROGRESS BARS ───────────────── */
 .pbar{height:8px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden;}
 .pfill{height:100%;border-radius:10px;transition:width .6s cubic-bezier(.34,1.56,.64,1);}
@@ -253,7 +247,7 @@ const VOCAB=[
 
 const WORLDS=[
   {id:1,title:"ממלכת החיות",emoji:"🦁",c:"#ff6b6b",cg:"rgba(255,107,107,.5)",
-   bossName:"אריה הנשמות",bossE:"🦁",bossHp:6,
+   bossName:"אריה הנשמות",bossE:"🦁",bossHp:5,
    taunts:{normal:["האם אתה מוכן?! 😈","לא תנצחו!","אני לאריה!"],
            angry:["זה בלתי אפשרי!!! 😤","כאב... קצת...","אל תחשוב/י שניצחת!"],
            enraged:["💀 עכשיו אני SERIOUS!","GRRR!!!","ZE LO YITACHEN!!!"]},
@@ -261,11 +255,11 @@ const WORLDS=[
    levels:[
     {id:"1_1",title:"שערי הג'ונגל",type:"match",icon:"🔗",story:"חיות מסתתרות! חבר/י זוגות לחשוף אותן."},
     {id:"1_2",title:"שיעור הג'ונגל",type:"quiz", icon:"🧠",story:"מלכת הג'ונגל בודקת אותך!"},
-    {id:"1_3",title:"מרוץ הנמרים", type:"speed",icon:"⚡",story:"45 שניות! תן/י הכל!"},
+    {id:"1_3",title:"מרוץ הנמרים", type:"speed",icon:"⚡",story:"זמן מוגבל! תן/י הכל!"},
     {id:"1_boss",title:"אריה הנשמות",type:"boss", icon:"👹",story:"הבוס מחכה! הכריעי אותו!"},
    ]},
   {id:2,title:"מגדל הזמן",emoji:"⏰",c:"#4ecdc4",cg:"rgba(78,205,196,.5)",
-   bossName:"שד השעות",bossE:"⏰",bossHp:7,
+   bossName:"שד השעות",bossE:"⏰",bossHp:6,
    taunts:{normal:["הזמן עובד בשבילי!","מהר מהר! 😈","לעולם לא תנצחי!"],
            angry:["הזמן... נגמר לי...","לא... לא!","עדיין יש לי כוח!"],
            enraged:["⚡ TURBO MODE!!!","01:00:00 !!! ⏱️","חסר לך זמן לי לא!"]},
@@ -273,11 +267,11 @@ const WORLDS=[
    levels:[
     {id:"2_1",title:"שעוני היום",  type:"match",icon:"🔗",story:"חבר/י מילות זמן!"},
     {id:"2_2",title:"חדר השגרה",   type:"quiz", icon:"🧠",story:"שאלות על שגרת יום!"},
-    {id:"2_3",title:"ספרינט הזמן", type:"speed",icon:"⚡",story:"45 שניות!"},
+    {id:"2_3",title:"ספרינט הזמן", type:"speed",icon:"⚡",story:"רוצי מהר ככל האפשר!"},
     {id:"2_boss",title:"שד השעות", type:"boss", icon:"👹",story:"שד השעות מחכה!"},
    ]},
   {id:3,title:"אקדמיית הכישרונות",emoji:"⭐",c:"#f7b731",cg:"rgba(247,183,49,.5)",
-   bossName:"הקוסם הרע",bossE:"🧙",bossHp:7,
+   bossName:"הקוסם הרע",bossE:"🧙",bossHp:6,
    taunts:{normal:["הכישרונות שלי!","לא תנצחי אותי!","הקסמים שלי חזקים!"],
            angry:["בלתי אפשרי...","הכישרונות חוזרים...","עדיין יש לי כוח!"],
            enraged:["💥 DARK SPELL!!!","אבדו הכוחות שלי!!!","לא ייתכן!!! 😱"]},
@@ -289,7 +283,7 @@ const WORLDS=[
     {id:"3_boss",title:"הקוסם הרע",  type:"boss", icon:"👹",story:"בטל/י קללות בתשובות נכונות!"},
    ]},
   {id:4,title:"ממלכת המסיבות",emoji:"🎂",c:"#a55eea",cg:"rgba(165,94,234,.5)",
-   bossName:"שד המסיבה",bossE:"😈",bossHp:8,
+   bossName:"שד המסיבה",bossE:"😈",bossHp:7,
    taunts:{normal:["המסיבה שלי!!!","לא תיכנסי!","אין לך הזמנה! 😈"],
            angry:["מה?! זה לא יתכן!","המסיבה... נגמרת...","עדיין לא!"],
            enraged:["💀 PARTY OVER!!!","הכל שחור!!! 😭","NOOOO!!!"]},
@@ -301,7 +295,7 @@ const WORLDS=[
     {id:"4_boss",title:"שד המסיבה",  type:"boss", icon:"👹",story:"הכריעי את שד המסיבה!"},
    ]},
   {id:5,title:"מגדל הידע",emoji:"💡",c:"#26de81",cg:"rgba(38,222,129,.5)",
-   bossName:"הבוס הסופי",bossE:"👾",bossHp:10,
+   bossName:"הבוס הסופי",bossE:"👾",bossHp:8,
    taunts:{normal:["הקרב הסופי!!! 💀","אתה/את לא מוכן/ה!","חיי כל חייך לזה!"],
            angry:["לא... לא יתכן!","הכוח שלי אוזל...","עדיין... לא..."],
            enraged:["☠️ FINAL FORM!!!","FULL POWER!!!","THIS IS IMPOSSIBLE!"]},
@@ -330,7 +324,7 @@ const CHARS=[
   {id:"dana",name:"דנה",role:"המהירה",e:"⚡",
    av:"https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop",
    c:"#a55eea",cg:"rgba(165,94,234,.4)",
-   ability:"speed_bonus",aName:"זמן נוסף",aDesc:"3 שניות נוספות בשלבי מהירות"},
+   ability:"speed_bonus",aName:"זמן נוסף",aDesc:"עוד זמן בשלבי מהירות"},
 ];
 
 const ACHIEV=[
@@ -351,7 +345,7 @@ const ACHIEV=[
 /* ═══════════════════════════════════════
    STATE
 ═══════════════════════════════════════ */
-const SK="eq_v10_spectacle";
+const SK="eq_v11_notimerboss";
 function defST(){return{charId:null,gems:50,xp:0,lvl:1,xpNext:100,hp:100,maxHp:100,
   potions:{hint:1,shield:0},levels:{},mastery:{},achievements:{},
   totalCorrect:0,comboRecord:0,superUsed:0,goldenHits:0,
@@ -476,8 +470,8 @@ function updateHUD(){const el=document.getElementById('hud-gems');if(el)el.textC
 /* ═══════════════════════════════════════
    NAVIGATION
 ═══════════════════════════════════════ */
-let _spTick=null,_bsTick=null,_shuffleTick=null;
-function clearTimers(){[_spTick,_bsTick,_shuffleTick].forEach(t=>{if(t){clearInterval(t);}});_spTick=_bsTick=_shuffleTick=null;}
+let _spTick=null,_shuffleTick=null;
+function clearTimers(){if(_spTick)clearInterval(_spTick);if(_shuffleTick)clearInterval(_shuffleTick);_spTick=_shuffleTick=null;}
 
 function go(screen,...args){
   clearTimers();window.scrollTo(0,0);
@@ -861,20 +855,21 @@ function checkQuiz(chosen,correct,idx){
 ═══════════════════════════════════════ */
 function startSpeed(){
   G.spWords=shuf([...G.vocab]);G.spCur=0;G.spAns=false;
-  G.spTime=ST.charId==='dana'?48:45;G.spCorrect=0;
+  // Increased time for Speed Mode
+  G.spTime=ST.charId==='dana'?63:60; G.spCorrect=0;
   renderSpeed();
   _spTick=setInterval(()=>{
     G.spTime--;
     const el=document.getElementById('sp-t');if(el)el.textContent=G.spTime;
     const tc=G.spTime>20?'#26de81':G.spTime>10?'#f7b731':'#ef4444';
     if(el)el.style.color=tc;
-    const bf=document.getElementById('sp-bar');if(bf){bf.style.width=(G.spTime/(ST.charId==='dana'?48:45)*100)+'%';bf.style.background=tc;}
+    const bf=document.getElementById('sp-bar');if(bf){bf.style.width=(G.spTime/(ST.charId==='dana'?63:60)*100)+'%';bf.style.background=tc;}
     if(G.spTime<=0){clearInterval(_spTick);_spTick=null;finishLevel();}
   },1000);
 }
 function renderSpeed(){
   if(G.spCur>=G.spWords.length){G.spWords=shuf([...G.vocab]);G.spCur=0;}
-  const w=G.spWords[G.spCur],tot=ST.charId==='dana'?48:45;
+  const w=G.spWords[G.spCur],tot=ST.charId==='dana'?63:60;
   const tc=G.spTime>20?'#26de81':G.spTime>10?'#f7b731':'#ef4444';
   G.isGolden=Math.random()<0.06;
   const opts=shuf([w.en,...randDist(w.en,3)]);
@@ -910,18 +905,17 @@ function checkSpeed(chosen,correct,idx){
 }
 
 /* ═══════════════════════════════════════
-   BOSS BATTLE
+   BOSS BATTLE (NO TIMER)
 ═══════════════════════════════════════ */
 function getBossPhase(){const r=G.bHp/G.bMaxHp;return r>.66?'normal':r>.33?'angry':'enraged';}
-function getBossTimerDur(){const ph=getBossPhase();const base=ST.charId==='dana'?11:8;return ph==='enraged'?Math.max(4,base-3):ph==='angry'?Math.max(5,base-1):base;}
 function getBossTaunt(){const phase=getBossPhase(),pool=G.w.taunts[phase];return pool[Math.floor(Math.random()*pool.length)];}
 
 function startBoss(){
   G.bHp=G.w.bossHp;G.bMaxHp=G.w.bossHp;
   G.bQueue=shuf([...G.vocab]);G.bCur=0;G.bAns=false;G.bPaused=false;
   G.bSpecial=false;G.bSpecialTurns=0;G.bHitSpecial=false;
-  G.bTime=getBossTimerDur();G.bTaunt=getBossTaunt();
-  renderBoss();startBossTick();
+  G.bTaunt=getBossTaunt();
+  renderBoss();
 }
 
 function renderBoss(){
@@ -932,11 +926,8 @@ function renderBoss(){
   const phase=getBossPhase();
   const hpPct=G.bHp/G.bMaxHp*100;
   const ch=getChar();
-  const tc=G.bTime<=3?'#ef4444':G.bTime<=5?'#f7b731':'#26de81';
-  const timerTotal=getBossTimerDur();
-  const circC=2*Math.PI*20;
-  const cirDash=circC*G.bTime/timerTotal;
   const phaseBadge=phase==='enraged'?`<div class="phase-badge phase-enraged">💀 ENRAGED</div>`:phase==='angry'?`<div class="phase-badge phase-angry">⚠️ ANGRY</div>`:`<div class="phase-badge phase-normal">● normal</div>`;
+  
   document.getElementById('app').innerHTML=`
     <div class="screen" style="background:radial-gradient(ellipse at 50% 20%,${phase==='enraged'?'#2a0505':phase==='angry'?'#1a0d00':'#0a0a1a'} 0%,#08081a 70%);min-height:100vh;">
       ${phase==='enraged'?`<div class="enrage-tint"></div>`:''}
@@ -964,16 +955,11 @@ function renderBoss(){
         </div>
         <div class="boss-dialogue" id="boss-dialogue">"${G.bTaunt}"</div>
       </div>
-      <div class="timer-ring-wrap">
-        <div class="timer-ring">
-          <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="22" cy="22" r="20" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="3.5"/>
-            <circle cx="22" cy="22" r="20" fill="none" stroke="${tc}" stroke-width="3.5" stroke-dasharray="${cirDash.toFixed(1)} ${circC.toFixed(1)}" stroke-linecap="round" id="boss-ring"/>
-          </svg>
-          <div class="timer-num" id="boss-t" style="color:${tc};">${G.bTime}</div>
-        </div>
-        ${G.bSpecial?`<div style="color:#ef4444;font-size:.75rem;font-weight:900;margin-right:8px;animation:pulseRed 1s ease infinite;">⚠️ DARK MAGIC!</div>`:''}
+      
+      <div style="text-align:center; height:20px; margin-bottom:10px;">
+          ${G.bSpecial?`<div style="color:#ef4444;font-size:.85rem;font-weight:900;animation:pulseRed 1s ease infinite;">⚠️ התשובות מעורבבות! קראי היטב!</div>`:''}
       </div>
+
       <div class="q-card${G.isGolden?' golden':''}">
         <div class="q-emoji" style="font-size:2.5rem;">${w.e}</div>
         <div class="q-he" style="font-size:1.5rem;">${w.he}</div>
@@ -994,22 +980,6 @@ function renderBoss(){
       shuf(btns).forEach(b=>grid.appendChild(b));
     },1400);
   }
-}
-
-function startBossTick(){
-  _bsTick=setInterval(()=>{
-    if(G.bPaused) return;
-    G.bTime--;
-    const tc=G.bTime<=3?'#ef4444':G.bTime<=5?'#f7b731':'#26de81';
-    const et=document.getElementById('boss-t');if(et){et.textContent=G.bTime;et.style.color=tc;}
-    const ring=document.getElementById('boss-ring');
-    if(ring){const tot=getBossTimerDur(),c=2*Math.PI*20;ring.setAttribute('stroke-dasharray',`${(c*G.bTime/tot).toFixed(1)} ${c.toFixed(1)}`);ring.setAttribute('stroke',tc);}
-    if(G.bTime<=0){
-        clearInterval(_bsTick);_bsTick=null;if(_shuffleTick){clearInterval(_shuffleTick);_shuffleTick=null;}
-        onWrong(null);
-        if(G.hearts>0) { nextBossTurn(); startBossTick(); }
-    }
-  },1000);
 }
 
 function checkBoss(chosen,correct,idx){
@@ -1053,8 +1023,8 @@ function checkBoss(chosen,correct,idx){
 }
 
 function nextBossTurn() {
-  G.bCur++; G.bAns=false; G.bTime=getBossTimerDur(); G.bTaunt=getBossTaunt();
-  setTimeout(()=>{ if(!G.bPaused){renderBoss();startBossTick();} }, 780);
+  G.bCur++; G.bAns=false; G.bTaunt=getBossTaunt();
+  setTimeout(()=>{ if(!G.bPaused){renderBoss();} }, 780);
 }
 
 function checkPhaseTransitions(prevHp) {
